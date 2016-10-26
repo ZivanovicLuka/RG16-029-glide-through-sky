@@ -1,12 +1,13 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 //==============================================================================
 // FUNCTION DECLARATIONS
 //==============================================================================
 
-void draw_box(float y, float x, float z, float R, float G, float B);
+void draw_player(float y, float x, float z, float R, float G, float B);
 void draw_wall(float x, int index);
 void summon_wall(int index);
 void summon_trail();
@@ -15,6 +16,8 @@ void check_score(int index);
 void teleport();
 void dash();
 void dash_start();
+void RenderString(float x, float y, void *font, const char* string, float r, float g, float b);
+
 
 static void on_timer(int value);
 static void on_display(void);
@@ -60,12 +63,41 @@ static World world = {
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+/* GUI */
+typedef struct {
+  float z; // Global z-index of gui
+  // HP
+  float hp_x;
+  float hp_y;
+  // Mana
+  float mana_x;
+  float mana_y;
+  // Score
+  float score_x;
+  float score_y;
+  char score_text[15];
+} GUI;
+
+static GUI gui = {
+  -1.,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+};
+
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 /* PLAYER */
 typedef struct {
   float x_curr;
   float y_curr;
   float v_y; // velocity
   float size;
+  int mana;
   int invulnerable;
   int dashing;
 } Player;
@@ -75,6 +107,7 @@ static Player player = {
   0,   //player.y_curr
   0,   //player.v_y
   .1,  //player.size
+  0,   //player.mana
   0,   //player.invulnerable
   0    //player.dashing
 };
@@ -138,17 +171,18 @@ int main(int argc, char* argv[]){
 
   srand(time(NULL));
 
+  strcpy(gui.score_text,"Score: 0");
 
   trails[0].pos_x = player.x_curr;
   trails[0].pos_y = 0;
-  trails[0].pos_z = .1;
+  trails[0].pos_z = -.9;
   trails[0].colors = trail_color_alpha;
 
   int i;
   for(i=1; i<TRAIL_MAX; i++){
     trails[i].pos_x = trails[i-1].pos_x - trail_x_move;
     trails[i].pos_y = 0;
-    trails[i].pos_z = trails[i-1].pos_z + .1; // FIXME magicna konstanta
+    trails[i].pos_z = trails[i-1].pos_z + .001; // FIXME magicna konstanta
     trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
   }
 
@@ -262,14 +296,29 @@ void on_display(){
     dash();
   }
 
-  draw_box(player.y_curr,player.x_curr,0 ,1,1,1); // FIXME jos konstanti
+  draw_player(player.y_curr, player.x_curr, -1., 1, 1, 1); // FIXME jos konstanti
+  // -1. je z
 
   for(i=0;i<trail_count;i++){
-    draw_box(trails[i].pos_y, trails[i].pos_x, trails[i].pos_z,
+    draw_player(trails[i].pos_y, trails[i].pos_x, trails[i].pos_z,
        rand() / ((float)RAND_MAX*0.5+0.5) * trails[i].colors, // FIXME sve ovo dole
        rand() / ((float)RAND_MAX*0.5+0.5) * trails[i].colors,
        rand() / ((float)RAND_MAX*0.5+0.5) * trails[i].colors);
   }
+
+
+
+// TODO Svasta
+
+
+  RenderString(-1.0, -1.0f, GLUT_BITMAP_HELVETICA_18, gui.score_text, 1.0f, 1.0f, 1.0f);
+
+
+
+
+
+
+
 
   glFlush();
   glutSwapBuffers();
@@ -280,7 +329,7 @@ void check_score(int index){
     if(walls[index].x_curr + wall_width/2 < player.x_curr - player.size/2){
       walls[index].pass = 1;
       world.score++;
-      printf("SCORE! (%d)\n", world.score);
+      sprintf(gui.score_text, "Score: %d", world.score); // FIXME SPORO!!!
     }
   }
 }
@@ -306,7 +355,7 @@ void collision(int index){
   }
 }
 
-void draw_box(float y, float x, float z, float colorR, float colorG, float colorB){
+void draw_player(float y, float x, float z, float colorR, float colorG, float colorB){
   glBegin(GL_POLYGON);
     glColor3f( colorR, colorG, colorB );
     glVertex3f(  player.size/2 + x, -player.size/2 + y, z );
@@ -342,8 +391,8 @@ void draw_wall(float x, int index){
     glBegin(GL_POLYGON);
       glColor3f( walls[index].colorR, walls[index].colorG, walls[index].colorB );
       glVertex3f(  wall_width/2 + x, 1, -1 );
-      glVertex3f(  wall_width/2 + x,  walls[index].y_bot, -1 );
-      glVertex3f( -wall_width/2 + x,  walls[index].y_bot, -1 );
+      glVertex3f(  wall_width/2 + x,  walls[index].y_bot, 0.01 );
+      glVertex3f( -wall_width/2 + x,  walls[index].y_bot, 0.01 );
       glVertex3f( -wall_width/2 + x, 1, -1 );
     glEnd();
 
@@ -395,4 +444,12 @@ void dash(){
     player.invulnerable = 0;
     wall_speed = 0.02;
   }
+}
+
+void RenderString(float x, float y, void *font, const char* string, float r, float g, float b)
+{
+  glColor3f(r, g, b);
+  glRasterPos3f(x, y, gui.z);
+
+  glutBitmapString(font, string);
 }
