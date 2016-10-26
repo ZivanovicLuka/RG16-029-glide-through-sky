@@ -66,6 +66,9 @@ static World world = {
 /* GUI */
 typedef struct {
   float z; // Global z-index of gui
+  // Plate
+  float plate_width;
+  float plate_height;
   // HP
   float hp_x;
   float hp_y;
