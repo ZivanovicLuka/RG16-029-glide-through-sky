@@ -3,3 +3,4 @@ extern float wall_speed;
 extern float wall_gap;
 extern float wall_gap_min;
 extern int wall_summon_index;
+extern Wall walls[];

@@ -5,36 +5,15 @@
 
 //==============================================================================
 
-#ifndef GLUT_FUCNTIONS_H
-  #define GLUT_FUCNTIONS_H
-  #include "glut_functions.h"
-#endif
+#include "glut_functions.h"
 
-//==============================================================================
-
-#ifndef PLAYER_H
-  #define PLAYER_H
-  #include "player.h"
-#endif
-
+#include "player.h"
 #include "player_externs.h"
 
-//==============================================================================
-
-#ifndef WALL_H
-  #define WALL_H
-  #include "wall.h"
-#endif
-
+#include "wall.h"
 #include "wall_externs.h"
 
-//==============================================================================
-
-#ifndef WORLD_H
-  #define WORLD_H
-  #include "world.h"
-#endif
-
+#include "world.h"
 #include "world_externs.h"
 
 //==============================================================================

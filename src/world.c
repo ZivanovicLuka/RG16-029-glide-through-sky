@@ -3,22 +3,13 @@
 #include <time.h>
 #include <string.h>
 
-#ifndef PLAYER_H
-  #define PLAYER_H
-  #include "player.h"
-#endif
-
+#include "player.h"
 #include "player_externs.h"
 
-#ifndef WALL_H
-  #define WALL_H
-  #include "wall.h"
-#endif
+#include "wall.h"
+#include "wall_externs.h"
 
-#ifndef WORLD_H
-  #define WORLD_H
-  #include "world.h"
-#endif
+#include "world.h"
 
 World world = {
   .0015, // world.gravity

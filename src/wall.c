@@ -3,15 +3,10 @@
 #include <time.h>
 #include <string.h>
 
-#ifndef PLAYER_H
-  #define PLAYER_H
-  #include "player.h"
-#endif
+#include "player.h"
+#include "wall.h"
 
-#ifndef WALL_H
-  #define WALL_H
-  #include "wall.h"
-#endif
+Wall walls[WALL_COUNT];
 
 const float wall_width = .3;
 float wall_speed = 0.02;
