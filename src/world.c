@@ -11,6 +11,10 @@
 
 #include "world.h"
 
+
+int window_width = 500;
+int window_height = 500;
+
 World world = {
   .0015, // world.gravity
   .035,  // world.jump

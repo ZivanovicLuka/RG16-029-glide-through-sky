@@ -24,12 +24,18 @@ float trail_color_alpha = 1;
 int trail_count = -5;
 
 void draw_player(float y, float x, float z, float colorR, float colorG, float colorB){
+
+  GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
   glBegin(GL_POLYGON);
-    glColor3f( colorR, colorG, colorB );
-    glVertex3f(  player.size/2 + x, -player.size/2 + y, z );
-    glVertex3f(  player.size/2 + x,  player.size/2 + y, z );
-    glVertex3f( -player.size/2 + x,  player.size/2 + y, z );
+    // glColor3f( colorR, colorG, colorB );
     glVertex3f( -player.size/2 + x, -player.size/2 + y, z );
+    glVertex3f( -player.size/2 + x,  player.size/2 + y, z );
+    glVertex3f(  player.size/2 + x,  player.size/2 + y, z );
+    glVertex3f(  player.size/2 + x, -player.size/2 + y, z );
+
+
   glEnd();
   glutPostRedisplay();
 }

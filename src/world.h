@@ -3,6 +3,9 @@
 
   void check_score(int index);
 
+  int window_width;
+  int window_height;
+
   typedef struct {
     // Global z-index of gui
     float z;

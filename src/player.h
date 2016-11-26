@@ -16,7 +16,7 @@
 
   #define TRAIL_TIMER_ID 2
   #define TRAIL_TIMER_INTERVAL 60
-  #define TRAIL_MAX 8
+  #define TRAIL_MAX 5
 
 
   typedef struct {

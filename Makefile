@@ -2,10 +2,10 @@
 CC      = gcc
 CFLAGS  = -g -Wall -I/usr/X11R6/include -I/usr/pkg/include
 LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib
-LDLIBS  = -lglut -lGLU -lGL
+LDLIBS  = -lglut -lGLU -lGL -lm
 
-glideThroughSky: main.o world.o player.o wall.o
-	$(CC) $(LDFLAGS) -o glideThroughSky main.o world.o player.o wall.o  $(LDLIBS)
+glideThroughSky: main.o world.o player.o wall.o mana.o
+	$(CC) $(LDFLAGS) -o glideThroughSky main.o world.o player.o wall.o mana.o  $(LDLIBS)
 
 main.o:
 		$(CC) $(LDFLAGS) -c src/main.c $(LDLIBS)
@@ -18,6 +18,9 @@ player.o:
 
 wall.o:
 	$(CC) $(LDFLAGS) -c src/wall.c $(LDLIBS)
+
+mana.o:
+	$(CC) $(LDFLAGS) -c src/mana.c $(LDLIBS)
 
 .PHONY: clean dist
 
