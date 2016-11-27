@@ -6,6 +6,8 @@
 #include "player.h"
 #include "wall.h"
 #include "wall_externs.h"
+#include "mana.h"
+#include "mana_externs.h"
 
 
 Player player = {
@@ -28,16 +30,23 @@ void draw_player(float y, float x, float z, float colorR, float colorG, float co
   GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
-  glBegin(GL_POLYGON);
-    // glColor3f( colorR, colorG, colorB );
-    glVertex3f( -player.size/2 + x, -player.size/2 + y, z );
-    glVertex3f( -player.size/2 + x,  player.size/2 + y, z );
-    glVertex3f(  player.size/2 + x,  player.size/2 + y, z );
-    glVertex3f(  player.size/2 + x, -player.size/2 + y, z );
+  // GLfloat diffuse_coeffs[] = { 0.0, 0.1, 1.0, 1.0 };
+  // glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
-
-  glEnd();
+  glPushMatrix();
+      glTranslatef(x,y,0); // TODO sredi kasnije, ovo je posle prelaska na 3d
+      glutSolidCube(player.size);
+  glPopMatrix();
   glutPostRedisplay();
+
+  // glBegin(GL_POLYGON);
+  //   glColor3f( colorR, colorG, colorB );
+  //   glVertex3f( -player.size/2 + x, -player.size/2 + y, z );
+  //   glVertex3f( -player.size/2 + x,  player.size/2 + y, z );
+  //   glVertex3f(  player.size/2 + x,  player.size/2 + y, z );
+  //   glVertex3f(  player.size/2 + x, -player.size/2 + y, z );
+  // glEnd();
+  // glutPostRedisplay();
 }
 
 void wall_collision(int index){
@@ -58,6 +67,33 @@ void wall_collision(int index){
   (PLAYER_bot <= wall_top && PLAYER_left <= wall_right && PLAYER_right >= wall_left)){
      exit(0);
      return;
+  }
+}
+
+void mana_collision(int index){
+  if(!crystals[index].alive)
+    return;
+
+  float mana_width = 0.085; // 0.06 * sqrt(2), posto je dijagonala
+
+  float mana_bot = crystals[index].curr_y - mana_width/2;
+  float mana_top = crystals[index].curr_y + mana_width/2;
+  float mana_left = crystals[index].curr_x - mana_width/2;
+  float mana_right = crystals[index].curr_x + mana_width/2;
+
+  float PLAYER_bot = player.y_curr - player.size/2;
+  float PLAYER_top = player.y_curr + player.size/2;
+  float PLAYER_left = player.x_curr - player.size/2;
+  float PLAYER_right = player.x_curr + player.size/2;
+
+  if((PLAYER_top >= mana_bot && PLAYER_left <= mana_right && PLAYER_right >= mana_left) ||
+  (PLAYER_bot <= mana_top && PLAYER_left <= mana_right && PLAYER_right >= mana_left)){
+     player.mana++;
+     if(player.dashing)
+        player.mana++;
+
+      crystals[index].alive = 0;
+      return;
   }
 }
 
@@ -87,7 +123,6 @@ void dash(){
     player.v_y = 0;
     wall_speed = 0.05;
   }
-
   else{
     player.invulnerable = 0;
     wall_speed = 0.02;

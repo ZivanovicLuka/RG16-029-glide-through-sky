@@ -32,6 +32,25 @@ GUI gui = {
   0,
 };
 
+void draw_world(){
+  GLfloat diffuse_coeffs[] = { 0.2, 0.2, 0.2, 1 };
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
+  glPushMatrix();
+      glTranslatef(0,3.5,0);
+      glScalef(1, 1, 0.3);
+      glutSolidCube(5);
+  glPopMatrix();
+
+  glPushMatrix();
+      glTranslatef(0,-3.5,0);
+      glScalef(1, 1, 0.3);
+      glutSolidCube(5);
+  glPopMatrix();
+
+  glutPostRedisplay();
+}
+
 void check_score(int index){
   if(!walls[index].pass){
     if(walls[index].x_curr + wall_width/2 < player.x_curr - player.size/2){

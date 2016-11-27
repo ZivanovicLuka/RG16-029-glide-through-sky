@@ -5,5 +5,6 @@
   static void on_timer(int value);
   static void on_display(void);
   static void on_keyboard(unsigned char key, int x, int y);
+  static void on_reshape(int width, int height);
 
 #endif

@@ -33,19 +33,22 @@ int main(int argc, char* argv[]){
   glutCreateWindow("Glide Through Sky");
 
   // TODO PRELAZAK NA 3D
-  // glMatrixMode(GL_PROJECTION);
-  // glLoadIdentity();
-  // gluPerspective(60.0, 1, 0.1, 100.0);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(60.0, 1, 0.1, 100.0);
 
   glClearColor(0.0, 0.0, 0.0, 0);
   glEnable(GL_DEPTH_TEST);
 
   glutKeyboardFunc(on_keyboard);
+  glutReshapeFunc(on_reshape);
   glutDisplayFunc(on_display);
 
   srand(time(NULL));
 
   strcpy(gui.score_text,"Score: 0");
+
+  player.mana = 3;
 
   trails[0].pos_x = player.x_curr;
   trails[0].pos_y = 0;
@@ -99,9 +102,9 @@ static void on_keyboard(unsigned char key, int x, int y) {
 
       case 'w':
       case 'W':
-        if(player.dashing == 0){
+        if(player.dashing == 0 && player.mana > 0){
           glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
-          // mana -= 5; // TODO
+          player.mana -= 1; // TODO
           player.dashing = 1;
           dash();
         }
@@ -109,6 +112,14 @@ static void on_keyboard(unsigned char key, int x, int y) {
     }
 }
 
+// FIXME ne radi uopste
+static void on_reshape(int width, int height){
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(60.0, (float)width/height, 0.1, 100.0);
+}
+
+int mana_counter = 0;
 void wall_mana(){
   summon_wall(wall_summon_index);
   wall_summon_index = (++wall_summon_index == WALL_COUNT) ? 0 : wall_summon_index;
@@ -117,9 +128,11 @@ void wall_mana(){
     wall_gap-=.03; // TODO prebaci konstantu u wall.c
   }
 
-  if( (rand() / (float)RAND_MAX) < 0.25 ){
+  mana_counter++;
+  if( mana_counter == 4 ){
     summon_mana(mana_summon_index);
     mana_summon_index = (++mana_summon_index == WALL_COUNT) ? 0 : mana_summon_index;
+    mana_counter = 0;
   }
 
   if (world.animation_ongoing) {
@@ -182,7 +195,8 @@ void on_display(){
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
   /* Pozicija svetla (u pitanju je direkcionalno svetlo). */
-  GLfloat light_position[] = { player.x_curr, player.y_curr, -.5, .8 };
+  // GLfloat light_position[] = { player.x_curr + .5, player.y_curr, 2, .8 };
+  GLfloat light_position[] = { player.x_curr + .2, 0, 2, .8 };
 
   GLfloat light_ambient[] = { 0.1, 0.1, 0.1, 1 };
   GLfloat light_diffuse[] = { 0.9, 0.9, 0.9, 1 };
@@ -196,7 +210,7 @@ void on_display(){
   GLfloat shininess = 20;
 
   /* Podesava se vidna tacka. */
-  // gluLookAt(0, 0, 1.5, 0, 0, 0, 0, 1, 0);
+  gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
 
   /* Ukljucuje se osvjetljenje i podesavaju parametri svetla. */
   glEnable(GL_LIGHTING);
@@ -215,11 +229,14 @@ void on_display(){
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
+  draw_world();
+
   int i;
-  if(!player.invulnerable){
-    for(i=0;i<WALL_COUNT;i++){
+  for(i=0;i<WALL_COUNT;i++){
+    if(!player.invulnerable){
       wall_collision(i);
     }
+    mana_collision(i);
   }
 
   for(i=0;i<WALL_COUNT;i++){ // sigurno je manje kristala od zidova (ili jednako)
@@ -235,6 +252,7 @@ void on_display(){
   }
 
   draw_player(player.y_curr, player.x_curr, -.5, 1, 0, 1); // FIXME jos konstanti
+  draw_mana_bar(player.mana);
 
   for(i=0;i<trail_count;i++){
     draw_player(trails[i].pos_y, trails[i].pos_x, trails[i].pos_z, // TODO crtaj trouglove, opacity, itd

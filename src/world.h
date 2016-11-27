@@ -2,6 +2,7 @@
   #define WORLD_H
 
   void check_score(int index);
+  void draw_world();
 
   int window_width;
   int window_height;
