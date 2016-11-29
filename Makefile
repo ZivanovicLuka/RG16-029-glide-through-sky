@@ -8,7 +8,7 @@ glideThroughSky: main.o world.o player.o wall.o mana.o
 	$(CC) $(LDFLAGS) -o glideThroughSky main.o world.o player.o wall.o mana.o  $(LDLIBS)
 
 main.o:
-		$(CC) $(LDFLAGS) -c src/main.c $(LDLIBS)
+	$(CC) $(LDFLAGS) -c src/main.c $(LDLIBS)
 
 world.o:
 	$(CC) $(LDFLAGS) -c src/world.c $(LDLIBS)

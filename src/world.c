@@ -23,7 +23,7 @@ World world = {
 };
 
 GUI gui = {
-  -1.,
+  -1,
   0,
   0,
   0,

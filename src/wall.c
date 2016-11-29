@@ -22,10 +22,6 @@ void summon_wall(int index){
   walls[index].colorR = rand() / (float)RAND_MAX * 0.5 + 0.5;
   walls[index].colorG = rand() / (float)RAND_MAX * 0.5 + 0.5;
   walls[index].colorB = rand() / (float)RAND_MAX * 0.5 + 0.5;
-  // walls[index].colorR = 1;
-  // walls[index].colorG = 1;
-  // walls[index].colorB = 1;
-
   walls[index].alive = 1;
   walls[index].pass = 0;
 }

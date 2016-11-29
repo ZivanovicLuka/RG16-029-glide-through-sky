@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
   for(i=1; i<TRAIL_MAX; i++){
     trails[i].pos_x = trails[i-1].pos_x - trail_x_move;
     trails[i].pos_y = 0;
-    trails[i].pos_z = trails[i-1].pos_z + .001; // FIXME magicna konstanta
+    trails[i].pos_z = trails[i-1].pos_z + .001;
     trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
   }
 
@@ -104,8 +104,16 @@ static void on_keyboard(unsigned char key, int x, int y) {
       case 'W':
         if(player.dashing == 0 && player.mana > 0){
           glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
-          player.mana -= 1; // TODO
+          player.mana -= 1;
           player.dashing = 1;
+          int pom = (int)(rand()/(float)RAND_MAX * global_colors_number);
+          Color3f new = global_colors[pom];
+          // printf("%f %f\n%f %f\n%f %f\n\n",player.colors.R, new.R, player.colors.G, new.G, player.colors.B, new.B);
+          if(player.colors.R == new.R && player.colors.G == new.G && player.colors.B == new.B){ // ako na rand da istu boju, uzmi sledecu
+
+            player.colors = global_colors[(pom+1)%global_colors_number];
+          } else
+            player.colors = new;
           dash();
         }
         break;
@@ -251,22 +259,22 @@ void on_display(){
     dash();
   }
 
-  draw_player(player.y_curr, player.x_curr, -.5, 1, 0, 1); // FIXME jos konstanti
+  draw_player(player.y_curr, player.x_curr, -.5, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
   draw_mana_bar(player.mana);
 
   for(i=0;i<trail_count;i++){
     draw_player(trails[i].pos_y, trails[i].pos_x, trails[i].pos_z, // TODO crtaj trouglove, opacity, itd
-      //  rand() / ((float)RAND_MAX*0.5+0.5) * trails[i].colors, // FIXME sve ovo dole
-      //  rand() / ((float)RAND_MAX*0.5+0.5) * trails[i].colors,
-      //  rand() / ((float)RAND_MAX*0.5+0.5) * trails[i].colors);
-      trails[i].colors,
-      0,
-      trails[i].colors);
+      player.colors.R * trails[i].colors,
+      player.colors.G * trails[i].colors,
+      player.colors.B * trails[i].colors);
   }
 
 // TODO Svasta sa ispisom teksta, pocevsi od plate-a pa na dalje
 // FIXME ovaj tekst ubija fps
-  // RenderString(-1.0, -1.0f, GLUT_BITMAP_HELVETICA_18, gui.score_text, 1.0f, 1.0f, 1.0f);
+  // float text_x = -.93;
+  // float text_y = .82;
+  // float text_z = .3;
+  // RenderString(text_x, text_y, GLUT_BITMAP_HELVETICA_18, gui.score_text, 1.0f, 1.0f, 1.0f);
 
   glFlush();
   glutSwapBuffers();
@@ -274,7 +282,8 @@ void on_display(){
 
 void RenderString(float x, float y, void *font, const char* string, float r, float g, float b)
 {
-  glColor3f(r, g, b);
-  glRasterPos3f(x, y, gui.z);
+  GLfloat diffuse_coeffs[] = { r, g, b, 1 };
+  // glRasterPos3f(x, y, gui.z);
+  glRasterPos3f(x, y, .3);
   glutBitmapString(font, string);
 }

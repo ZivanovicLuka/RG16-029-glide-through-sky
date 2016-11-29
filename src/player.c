@@ -15,10 +15,27 @@ Player player = {
   0,   //player.y_curr
   0,   //player.v_y
   .1,  //player.size
+  {1,   //player.colorR
+  0,   //player.colorG
+  1},   //player.colorB
   0,   //player.mana
   0,   //player.invulnerable
   0    //player.dashing
 };
+
+// 1,0,1 FF00FF = Neon Pink
+// 0,1,0  00FF00 = Neon Green
+// 1,1,0  FFFF00 = Neon Yellow
+// 1,.2,0 FF3300 = Neon Orange
+// 1,0,0  FF0009 = Neon Red
+// .5,0,1 6600FF = Neon Purple
+// 0,1,.6 00FF99 = Neon Mint Green
+// 0,0,.8 0000BF = Neon Dark Blue
+// 0,0,1  0000FF = Neon Blue
+// 0,1,1  00FFFF = Light Blue
+
+Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,0},{1,0,0},{.5,0,1},{0,1,.6},{0,0,.5},{0,0,1},{0,1,1}};
+int global_colors_number = 10;
 
 Trail trails[TRAIL_MAX];
 float trail_x_move = .05;
@@ -86,8 +103,8 @@ void mana_collision(int index){
   float PLAYER_left = player.x_curr - player.size/2;
   float PLAYER_right = player.x_curr + player.size/2;
 
-  if((PLAYER_top >= mana_bot && PLAYER_left <= mana_right && PLAYER_right >= mana_left) ||
-  (PLAYER_bot <= mana_top && PLAYER_left <= mana_right && PLAYER_right >= mana_left)){
+  if(PLAYER_top >= mana_bot && PLAYER_left <= mana_right && PLAYER_right >= mana_left &&
+  PLAYER_bot <= mana_top){
      player.mana++;
      if(player.dashing)
         player.mana++;
