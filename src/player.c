@@ -42,28 +42,18 @@ float trail_x_move = .05;
 float trail_color_alpha = 1;
 int trail_count = -5;
 
-void draw_player(float y, float x, float z, float colorR, float colorG, float colorB){
+void draw_player(float y, float x, float colorR, float colorG, float colorB){
 
   GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
-  // GLfloat diffuse_coeffs[] = { 0.0, 0.1, 1.0, 1.0 };
-  // glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
   glPushMatrix();
-      glTranslatef(x,y,0); // TODO sredi kasnije, ovo je posle prelaska na 3d
+      glTranslatef(x,y,0);
       glutSolidCube(player.size);
   glPopMatrix();
   glutPostRedisplay();
 
-  // glBegin(GL_POLYGON);
-  //   glColor3f( colorR, colorG, colorB );
-  //   glVertex3f( -player.size/2 + x, -player.size/2 + y, z );
-  //   glVertex3f( -player.size/2 + x,  player.size/2 + y, z );
-  //   glVertex3f(  player.size/2 + x,  player.size/2 + y, z );
-  //   glVertex3f(  player.size/2 + x, -player.size/2 + y, z );
-  // glEnd();
-  // glutPostRedisplay();
 }
 
 void wall_collision(int index){
@@ -138,11 +128,11 @@ void dash(){
   if(player.dashing){
     player.invulnerable = 1;
     player.v_y = 0;
-    wall_speed = 0.05;
+    wall_speed = 0.03;
   }
   else{
     player.invulnerable = 0;
-    wall_speed = 0.02;
+    wall_speed = 0.013;
   }
 }
 

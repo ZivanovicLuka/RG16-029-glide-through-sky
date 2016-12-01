@@ -20,12 +20,14 @@ void summon_mana(int index){
 
 void draw_mana_crystal(int index){
   if(crystals[index].alive){
-    GLfloat diffuse_coeffs[] = { 0.0, 0.1, 1.0, 1.0 };
+    GLfloat diffuse_coeffs[] = { 0.0, .2, 1, .1 };
+    GLfloat emission_coeffs[] = { .03, .03, .35, 1 };
+
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+    glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+
 
     glPushMatrix();
-        // glColor3f(0, 0, 1);
-
         glTranslatef(crystals[index].curr_x, crystals[index].curr_y , 0);
 
         glRotatef(rotation, 0, 1, 0);
@@ -34,7 +36,31 @@ void draw_mana_crystal(int index){
 
         glutSolidCube(.06);
     glPopMatrix();
-    glutPostRedisplay();
+
+    emission_coeffs[0] = .3;
+    emission_coeffs[1] = .3;
+    emission_coeffs[2] = 1;
+    emission_coeffs[3] = 1;
+    glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+
+    glPushMatrix();
+        glTranslatef(crystals[index].curr_x, crystals[index].curr_y , 0);
+
+        glRotatef(rotation, 0, 1, 0);
+        glScalef(1, 1.2, 1);
+        glRotatef(45,1,0,1);
+
+        glutWireCube(.065);
+    glPopMatrix();
+
+    emission_coeffs[0] = 0;
+    emission_coeffs[1] = 0;
+    emission_coeffs[2] = 0;
+    emission_coeffs[3] = 1;
+    
+    glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+    
+    
   }
 }
 
@@ -47,16 +73,29 @@ void draw_mana_bar(int mana){
   float y = .92;
   float z = .3;
 
+  // GLfloat emission_coeffs[] = { 0, 0, 1, 1 };
+  // GLfloat diffuse_coeffs[] = { 0, 0, 1, 1 };
+  GLfloat specular_coeffs[] = { 0, 0.05, 1, 1 };
+
+
+  // glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+  // glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
+
+
   int i;
   for(i=0;i<mana;i++){
-    GLfloat diffuse_coeffs[] = { 0, 0, 1, 1 };
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
-
+  
     glPushMatrix();
         glTranslatef(start_x + i*small_width, y, z);
         glScalef(small_width*0.8 ,height,.001);
         glutSolidCube(1);
     glPopMatrix();
-    glutPostRedisplay();
+    
   }
+  // emission_coeffs[0] = 0;
+  // emission_coeffs[1] = 0;
+  // emission_coeffs[2] = 0;
+  // emission_coeffs[3] = 1;
+  // glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
 }

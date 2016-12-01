@@ -9,13 +9,13 @@
 Wall walls[WALL_COUNT];
 
 const float wall_width = .3;
-float wall_speed = 0.02;
+float wall_speed = 0.013;
 float wall_gap = 1.;
 float wall_gap_min = .7;
 int wall_summon_index = 0;
 
 void summon_wall(int index){
-  float r = rand() / (float)RAND_MAX * (2 - wall_gap) - 1 + wall_gap;
+  float r = rand() / (float)RAND_MAX * (1.7 - wall_gap) - 1 + wall_gap + .15; //1.6 i +.2 fiksuju da zid ne bude previse kratak (ni gornji ni donji)
   walls[index].x_curr = 1 + wall_width/2 + 1; // od kad je 3d ide i +1
   walls[index].y_bot = r;
   walls[index].y_top = r - wall_gap;

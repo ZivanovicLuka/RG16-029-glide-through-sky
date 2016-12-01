@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
   #define PLAYER_H
 
-  void draw_player(float y, float x, float z, float R, float G, float B);
+  void draw_player(float y, float x, float R, float G, float B);
   void wall_collision(int index);
   void mana_collision(int index);
   void dash();
