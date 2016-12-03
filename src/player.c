@@ -117,7 +117,7 @@ void teleport(){
 }
 
 void player_move(){
-  player.y_curr += player.v_y;
+  player.y_curr += player.v_y * speed_correction;
   if(player.v_y > -.029){ // FIXME konstanta
     player.v_y -= world.gravity * speed_correction;
   }

@@ -39,6 +39,8 @@ int main(int argc, char* argv[]){
   glutReshapeFunc(on_reshape);
   glutDisplayFunc(on_display);
 
+  dt = glutGet(GLUT_ELAPSED_TIME);
+
   srand(time(NULL));
 
   score_init();
@@ -90,7 +92,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
 
       case 'q':
       case 'Q':
-        player.v_y = world.jump * speed_correction;
+        player.v_y = world.jump;
         break;
 
       // TODO vidi da ubacis i glutTimerFunc u dash_start
@@ -129,7 +131,6 @@ void wall_mana(){
 
 
 static void on_timer(int value){
-
     // TODO mozda stavi preko distance, nema potrebe za tajmerom
     if(value == TRAIL_TIMER_ID){
       summon_trail();
@@ -143,7 +144,10 @@ static void on_timer(int value){
 
       // Correction for different performances
       updateDeltaTime();
-      speed_correction = dt / PLAYER_REFRESH_TIMER_INTERVAL;
+      
+      speed_correction = dt / (float)PLAYER_REFRESH_TIMER_INTERVAL;
+      // printf("%lf\n",speed_correction);
+      // printf("%.2f %f %d\n",speed_correction, dt, PLAYER_REFRESH_TIMER_INTERVAL);
       float ms = wall_speed * speed_correction;
 
       if(world.distance>=1.5){
@@ -269,8 +273,7 @@ void on_display(){
   glutSwapBuffers();
 }
 
-void RenderString(float x, float y, void *font, const char* string, float r, float g, float b)
-{
+void RenderString(float x, float y, void *font, const char* string, float r, float g, float b) {
   GLfloat emission_coeffs[] = { r, g, b, 1 };
   glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
   glRasterPos3f(x, y, .3);
@@ -287,18 +290,18 @@ static int newTime;
 static int oldTime = 0;
 static int timeSum = 0;
 
-void updateDeltaTime()
-{
-    newTime=glutGet(GLUT_ELAPSED_TIME);
+void updateDeltaTime() {
+    newTime = glutGet(GLUT_ELAPSED_TIME);
+    // printf("TIME: %f\n",newTime);
     dt = newTime - oldTime;
+    // printf("dt: %f\n");
     oldTime = newTime;
     timeSum += dt;
     if (dt>DT_MAX)
         dt=DT_MAX;
 }
 
-void fps(int print)
-{
+void fps(int print) {
     static int frame = 0;
     frame++;
     if (print && timeSum >= 1000){
