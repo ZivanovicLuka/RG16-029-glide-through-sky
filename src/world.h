@@ -3,9 +3,11 @@
 
   void check_score(int index);
   void draw_world();
+  void score_init();
 
   int window_width;
   int window_height;
+  float speed_correction;
 
   typedef struct {
     // Global z-index of gui
@@ -29,6 +31,7 @@
     float gravity;
     float jump;
     int score;
+    float distance;
     int animation_ongoing;
   } World;
 

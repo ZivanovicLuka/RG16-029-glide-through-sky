@@ -32,11 +32,7 @@ int main(int argc, char* argv[]){
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutCreateWindow("Glide Through Sky");
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(60.0, 1, 0.1, 100.0);
-
-  glClearColor(0.0, 0.0, 0.0, 0);
+  glClearColor(0.01, 0.01, 0.02, 0);
   glEnable(GL_DEPTH_TEST);
 
   glutKeyboardFunc(on_keyboard);
@@ -45,10 +41,10 @@ int main(int argc, char* argv[]){
 
   srand(time(NULL));
 
-  strcpy(gui.score_text,"Score: 0");
+  score_init();
+  wall_init();
 
-  player.mana = 3;
-
+  // TODO trails update ////////////////////
   trails[0].pos_x = player.x_curr;
   trails[0].pos_y = 0;
   trails[0].pos_z = -.4;
@@ -61,11 +57,8 @@ int main(int argc, char* argv[]){
     trails[i].pos_z = trails[i-1].pos_z + .001;
     trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
   }
+  //////////////////////////////////////////
 
-  for(i=0; i<WALL_COUNT; i++){
-    walls[i].pass = 1;
-    walls[i].alive = 0;
-  }
 
   glutMainLoop();
 
@@ -78,6 +71,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
         exit(0);
         break;
 
+      // TODO razmisli da li ti je uopste potrebno da se pauzira ili samo da se startuje
       case 'g':
       case 'G':
         if (!world.animation_ongoing) {
@@ -92,32 +86,25 @@ static void on_keyboard(unsigned char key, int x, int y) {
       case 'S':
         world.animation_ongoing = 0;
         break;
+     /////////////////////////////////////////////////////////////////////////////////////////
 
       case 'q':
       case 'Q':
-        player.v_y = world.jump;
+        player.v_y = world.jump * speed_correction;
         break;
 
+      // TODO vidi da ubacis i glutTimerFunc u dash_start
       case 'w':
       case 'W':
         if(player.dashing == 0 && player.mana > 0){
           glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
-          player.mana -= 1;
-          player.dashing = 1;
-          int pom = (int)(rand()/(float)RAND_MAX * global_colors_number);
-          Color3f new = global_colors[pom];
-          if(player.colors.R == new.R && player.colors.G == new.G && player.colors.B == new.B){ // ako na rand da istu boju, uzmi sledecu
-
-            player.colors = global_colors[(pom+1)%global_colors_number];
-          } else
-            player.colors = new;
-          dash();
+          dash_start();
         }
         break;
+      ////////////////////////////////////////////////////////
     }
 }
 
-// FIXME ne radi uopste
 static void on_reshape(int width, int height){
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -128,67 +115,62 @@ static void on_reshape(int width, int height){
   glutPostRedisplay();
 }
 
+// TODO OVO SVE U FUNKCIJU 
 int mana_counter = 0;
 void wall_mana(){
-  summon_wall(wall_summon_index);
-  wall_summon_index = (++wall_summon_index == WALL_COUNT) ? 0 : wall_summon_index;
-
-  if(wall_gap>wall_gap_min){
-    wall_gap-=.03; // TODO prebaci konstantu u wall.c
-  }
-
   mana_counter++;
   if( mana_counter == 4 ){
     summon_mana(mana_summon_index);
     mana_summon_index = (++mana_summon_index == WALL_COUNT) ? 0 : mana_summon_index;
     mana_counter = 0;
   }
-
-  if (world.animation_ongoing) {
-    glutTimerFunc(WALL_SUMMON_INTERVAL, on_timer, WALL_SUMMON_TIMER_ID);
-  }
 }
+///////////////////////////////////////////////////
 
-float distance = 0;
 
 static void on_timer(int value){
 
+    // TODO mozda stavi preko distance, nema potrebe za tajmerom
     if(value == TRAIL_TIMER_ID){
       summon_trail();
       if (world.animation_ongoing) {
         glutTimerFunc(TRAIL_TIMER_INTERVAL, on_timer, TRAIL_TIMER_ID);
       }
     }
+    //////////////////////////////////////////////////
 
     if(value == PLAYER_REFRESH_TIMER_ID){
 
+      // Correction for different performances
       updateDeltaTime();
-      float ms = wall_speed * dt / PLAYER_REFRESH_TIMER_INTERVAL;
-      // printf("%f\n",ms);
+      speed_correction = dt / PLAYER_REFRESH_TIMER_INTERVAL;
+      float ms = wall_speed * speed_correction;
 
-      if(distance>=1.5){
-        distance-=1.3;
+      if(world.distance>=1.5){
+        world.distance-=1.3;
+        summon_wall();
         wall_mana();
       }
 
-      player.y_curr += player.v_y;
-      if(player.v_y > -.029){ // FIXME konstanta
-        player.v_y -= world.gravity;
-      }
+      player_move();
+      
 
-      distance += ms;
+      world.distance += ms;
 
       int i;
       for(i=0;i<WALL_COUNT;i++){
         walls[i].x_curr -= ms;
 
-        //TODO SREDI OVO (MANA)
-        rotation += ms*80.;
+        check_score(i);
+
+        // TODO STAVI JEDAN MANA KRISTAL
+        rotation += speed_correction * .8;
         if (world.animation_ongoing) {
           crystals[i].curr_x -= ms;
         }
         
-        crystals[i].curr_y = sin(crystals[i].curr_x*5)*.08;
+        crystals[i].curr_y = sin(rotation*.02)*.08;
+        ///////////////////////////////////////////
       }
 
       glutPostRedisplay();
@@ -211,7 +193,6 @@ void on_display(){
   fps(1);
 
   /* Pozicija svetla (u pitanju je direkcionalno svetlo). */
-  // GLfloat light_position[] = { player.x_curr + .5, player.y_curr, 2, .8 };
   GLfloat light_position[] = { 0, 0, 3.55, 1 };
 
   GLfloat light_ambient[] = { 0.1, 0.1, 0.1, 1 };
@@ -219,7 +200,6 @@ void on_display(){
   GLfloat light_specular[] = { 0.9, 0.9, 0.9, 1 };
 
   GLfloat ambient_coeffs[] = { 0.3, 0.3, 0.3, 1 };
-  GLfloat diffuse_coeffs[] = { 0.0, 0.5, 0.8, 1 };
   GLfloat specular_coeffs[] = { 0.5, 0.5, 0.5, 1 };
 
   /* Koeficijent glatkosti materijala. */
@@ -239,7 +219,6 @@ void on_display(){
 
   /* Podesavaju se parametri materijala. */
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
   glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
   glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
@@ -248,6 +227,7 @@ void on_display(){
 
   draw_world();
 
+  // Kolizija igraca i zidova
   int i;
   for(i=0;i<WALL_COUNT;i++){
     if(!player.invulnerable){
@@ -256,14 +236,15 @@ void on_display(){
     mana_collision(i);
   }
 
+  // TODO jedan mana kristala
   for(i=0;i<WALL_COUNT;i++){ // sigurno je manje kristala od zidova (ili jednako)
     draw_mana_crystal(i);
 
     draw_wall(walls[i].x_curr,i);
-    check_score(i);
   }
 
   teleport();
+
   if(player.dashing){
     dash();
   }
@@ -279,7 +260,6 @@ void on_display(){
   }
 
 // TODO Svasta sa ispisom teksta, pocevsi od plate-a pa na dalje
-// FIXME ovaj tekst ubija fps
   float text_x = -.93;
   float text_y = .82;
   float text_z = .3;

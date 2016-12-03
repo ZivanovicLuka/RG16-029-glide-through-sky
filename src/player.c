@@ -6,6 +6,8 @@
 #include "player.h"
 #include "wall.h"
 #include "wall_externs.h"
+#include "world.h"
+#include "world_externs.h"
 #include "mana.h"
 #include "mana_externs.h"
 
@@ -18,7 +20,7 @@ Player player = {
   {1,   //player.colorR
   0,   //player.colorG
   1},   //player.colorB
-  0,   //player.mana
+  3,   //player.mana
   0,   //player.invulnerable
   0    //player.dashing
 };
@@ -114,14 +116,24 @@ void teleport(){
   }
 }
 
+void player_move(){
+  player.y_curr += player.v_y;
+  if(player.v_y > -.029){ // FIXME konstanta
+    player.v_y -= world.gravity * speed_correction;
+  }
+}
+
 void dash_start(){
-  // FIXME
-    // if(player.dashing == 0){
-    //   glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
-    //   // mana -= 5; // TODO
-    //   player.dashing = 1;
-    //   dash();
-    // }
+  player.mana -= 1;
+  player.dashing = 1;
+  int pom = (int)(rand()/(float)RAND_MAX * global_colors_number);
+  Color3f new = global_colors[pom];
+  if(player.colors.R == new.R && player.colors.G == new.G && player.colors.B == new.B){ // ako na rand da istu boju, uzmi sledecu
+
+    player.colors = global_colors[(pom+1)%global_colors_number];
+  } else
+    player.colors = new;
+  dash();
 }
 
 void dash(){

@@ -7,6 +7,7 @@
   void dash();
   void dash_start();
   void teleport();
+  void player_move();
   void summon_trail();
 
   #define PLAYER_REFRESH_TIMER_ID 0

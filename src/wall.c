@@ -12,9 +12,25 @@ const float wall_width = .3;
 float wall_speed = 0.013;
 float wall_gap = 1.;
 float wall_gap_min = .7;
+float wall_gap_dec = .03;
 int wall_summon_index = 0;
 
-void summon_wall(int index){
+void wall_init(){
+  int i;
+  for(i=0; i<WALL_COUNT; i++){
+      walls[i].pass = 1;
+      walls[i].alive = 0;
+  }
+}
+
+void summon_wall(){
+  wall_summon_index = (++wall_summon_index == WALL_COUNT) ? 0 : wall_summon_index;
+  int index = wall_summon_index;
+
+  if(wall_gap > wall_gap_min){
+    wall_gap -= wall_gap_dec;
+  }
+
   float r = rand() / (float)RAND_MAX * (1.7 - wall_gap) - 1 + wall_gap + .15; //1.6 i +.2 fiksuju da zid ne bude previse kratak (ni gornji ni donji)
   walls[index].x_curr = 1 + wall_width/2 + 1; // od kad je 3d ide i +1
   walls[index].y_bot = r;

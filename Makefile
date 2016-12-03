@@ -5,7 +5,7 @@ LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib
 LDLIBS  = -lglut -lGLU -lGL -lm
 
 glideThroughSky: main.o world.o player.o wall.o mana.o
-	$(CC) $(LDFLAGS) -o glideThroughSky main.o world.o player.o wall.o mana.o  $(LDLIBS)
+	$(CC) $(LDFLAGS) -o glideThroughSky.out main.o world.o player.o wall.o mana.o  $(LDLIBS)
 
 main.o:
 	$(CC) $(LDFLAGS) -c src/main.c $(LDLIBS)
