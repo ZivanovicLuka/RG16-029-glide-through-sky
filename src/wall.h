@@ -5,9 +5,6 @@
   void summon_wall();
   void wall_init();
 
-  #define WALL_SUMMON_TIMER_ID 1
-  #define WALL_SUMMON_INTERVAL 1000
-
   #define WALL_COUNT 3
 
   typedef struct {

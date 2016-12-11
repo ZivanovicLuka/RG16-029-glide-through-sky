@@ -79,16 +79,16 @@ void wall_collision(int index){
   }
 }
 
-void mana_collision(int index){
-  if(!crystals[index].alive)
+void mana_collision(){
+  if(!crystal.alive)
     return;
 
   float mana_width = 0.085; // 0.06 * sqrt(2), posto je dijagonala
 
-  float mana_bot = crystals[index].curr_y - mana_width/2;
-  float mana_top = crystals[index].curr_y + mana_width/2;
-  float mana_left = crystals[index].curr_x - mana_width/2;
-  float mana_right = crystals[index].curr_x + mana_width/2;
+  float mana_bot = crystal.curr_y - mana_width/2;
+  float mana_top = crystal.curr_y + mana_width/2;
+  float mana_left = crystal.curr_x - mana_width/2;
+  float mana_right = crystal.curr_x + mana_width/2;
 
   float PLAYER_bot = player.y_curr - player.size/2;
   float PLAYER_top = player.y_curr + player.size/2;
@@ -101,7 +101,7 @@ void mana_collision(int index){
      if(player.dashing)
         player.mana++;
 
-      crystals[index].alive = 0;
+      crystal.alive = 0;
       return;
   }
 }

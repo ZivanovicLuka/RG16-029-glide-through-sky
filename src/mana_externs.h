@@ -1,3 +1,3 @@
-extern float rotation;
-extern int mana_summon_index;
-extern Crystal crystals[];
+extern float mana_crystal_rotation;
+extern Crystal crystal;
+extern int walls_passed_counter;

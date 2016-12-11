@@ -20,6 +20,9 @@
 #include "mana.h"
 #include "mana_externs.h"
 
+#include "enemy.h"
+#include "enemy_externs.h"
+
 //==============================================================================
 
 int main(int argc, char* argv[]){
@@ -73,12 +76,10 @@ static void on_keyboard(unsigned char key, int x, int y) {
         exit(0);
         break;
 
-      // TODO razmisli da li ti je uopste potrebno da se pauzira ili samo da se startuje
       case 'g':
       case 'G':
         if (!world.animation_ongoing) {
             glutTimerFunc(PLAYER_REFRESH_TIMER_INTERVAL, on_timer, PLAYER_REFRESH_TIMER_ID);
-            glutTimerFunc(WALL_SUMMON_INTERVAL, on_timer, WALL_SUMMON_TIMER_ID);
             glutTimerFunc(TRAIL_TIMER_INTERVAL, on_timer, TRAIL_TIMER_ID);
             world.animation_ongoing = 1;
         }
@@ -88,17 +89,17 @@ static void on_keyboard(unsigned char key, int x, int y) {
       case 'S':
         world.animation_ongoing = 0;
         break;
-     /////////////////////////////////////////////////////////////////////////////////////////
 
       case 'q':
       case 'Q':
-        player.v_y = world.jump;
+        if(!player.dashing)
+          player.v_y = world.jump;
         break;
 
       // TODO vidi da ubacis i glutTimerFunc u dash_start
       case 'w':
       case 'W':
-        if(player.dashing == 0 && player.mana > 0){
+        if(!player.dashing && player.mana > 0){
           glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
           dash_start();
         }
@@ -112,23 +113,10 @@ static void on_reshape(int width, int height){
   glLoadIdentity();
 
   int left = (width - height) / 2;
-  glViewport(left, 0, height, height);       
+  glViewport(left, 0, height, height);
   gluPerspective(60.0, 1, 0.1, 100.0);
   glutPostRedisplay();
 }
-
-// TODO OVO SVE U FUNKCIJU 
-int mana_counter = 0;
-void wall_mana(){
-  mana_counter++;
-  if( mana_counter == 4 ){
-    summon_mana(mana_summon_index);
-    mana_summon_index = (++mana_summon_index == WALL_COUNT) ? 0 : mana_summon_index;
-    mana_counter = 0;
-  }
-}
-///////////////////////////////////////////////////
-
 
 static void on_timer(int value){
     // TODO mozda stavi preko distance, nema potrebe za tajmerom
@@ -140,11 +128,12 @@ static void on_timer(int value){
     }
     //////////////////////////////////////////////////
 
+
     if(value == PLAYER_REFRESH_TIMER_ID){
 
       // Correction for different performances
       updateDeltaTime();
-      
+
       speed_correction = dt / (float)PLAYER_REFRESH_TIMER_INTERVAL;
       // printf("%lf\n",speed_correction);
       // printf("%.2f %f %d\n",speed_correction, dt, PLAYER_REFRESH_TIMER_INTERVAL);
@@ -153,29 +142,32 @@ static void on_timer(int value){
       if(world.distance>=1.5){
         world.distance-=1.3;
         summon_wall();
-        wall_mana();
+        summon_enemy();
+        // printf("%d\n",walls_passed_counter);
+        if((walls_passed_counter = (walls_passed_counter+1)%4) == 0)
+          summon_mana();
       }
 
+
       player_move();
-      
+
 
       world.distance += ms;
 
       int i;
       for(i=0;i<WALL_COUNT;i++){
         walls[i].x_curr -= ms;
-
+        enemies[i].x_curr -= ms;
         check_score(i);
-
-        // TODO STAVI JEDAN MANA KRISTAL
-        rotation += speed_correction * .8;
-        if (world.animation_ongoing) {
-          crystals[i].curr_x -= ms;
-        }
-        
-        crystals[i].curr_y = sin(rotation*.02)*.08;
-        ///////////////////////////////////////////
       }
+
+
+      mana_crystal_rotation += speed_correction * 1.8;
+      if (world.animation_ongoing) {
+        crystal.curr_x -= ms;
+      }
+      crystal.curr_y = sin(mana_crystal_rotation*.02)*.08;
+
 
       glutPostRedisplay();
 
@@ -219,7 +211,7 @@ void on_display(){
   glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-  
+
 
   /* Podesavaju se parametri materijala. */
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
@@ -245,6 +237,7 @@ void on_display(){
     draw_mana_crystal(i);
 
     draw_wall(walls[i].x_curr,i);
+    draw_enemy(enemies[i].x_curr,enemies[i].y_curr,1,0,0,enemies[i].alive);
   }
 
   teleport();
@@ -255,7 +248,7 @@ void on_display(){
 
   draw_mana_bar(player.mana);
   draw_player(player.y_curr, player.x_curr, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
-  
+
   for(i=0;i<trail_count;i++){
     draw_player(trails[i].pos_y, trails[i].pos_x, // TODO crtaj trouglove, opacity, itd
       player.colors.R * trails[i].colors,

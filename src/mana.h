@@ -1,8 +1,8 @@
 #ifndef MANA_H
   #define MANA_H
 
-  void draw_mana_crystal(int index);
-  void summon_mana(int index);
+  void draw_mana_crystal();
+  void summon_mana();
 
   typedef struct {
     float curr_y;
@@ -11,7 +11,7 @@
     int pass; // ne znam sta je sad
   } Crystal;
 
-  float rotation;
-  int mana_summon_index;
+  float mana_crystal_rotation;
+  int walls_passed_counter;
 
 #endif
