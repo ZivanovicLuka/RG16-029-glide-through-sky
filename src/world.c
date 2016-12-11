@@ -17,7 +17,7 @@ int window_height = 500;
 float speed_correction = 1;
 
 World world = {
-  .0008, // world.gravity
+  .0007, // world.gravity
   .027,  // world.jump
   0,     // world.score
   0,     // world.distance
