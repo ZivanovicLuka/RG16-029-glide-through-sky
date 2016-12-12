@@ -21,7 +21,7 @@ void summon_mana(int index){
 void draw_mana_crystal(){
   if(crystal.alive){
     GLfloat diffuse_coeffs[] = { 0.0, .2, 1, .1 };
-    GLfloat emission_coeffs[] = { .03, .03, .35, 1 };
+    GLfloat emission_coeffs[] = { .03, .03, .43, 1 };
 
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
     glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
@@ -47,10 +47,10 @@ void draw_mana_crystal(){
         glTranslatef(crystal.curr_x, crystal.curr_y , 0);
 
         glRotatef(mana_crystal_rotation, 0, 1, 0);
-        glScalef(1, 1.2, 1);
+        glScalef(1, 1.5, 1);
         glRotatef(45,1,0,1);
 
-        glutWireCube(.065);
+        // glutWireCube(.0601);
     glPopMatrix();
 
     emission_coeffs[0] = 0;
@@ -79,7 +79,7 @@ void draw_mana_bar(int mana){
 
 
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
-  // glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+  // glMaterialfv(GL_FRONT, GL_EMISSION, specular_coeffs);
   glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
 
 

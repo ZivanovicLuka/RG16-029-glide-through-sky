@@ -25,19 +25,8 @@ Player player = {
   0    //player.dashing
 };
 
-// 1,0,1 FF00FF = Neon Pink
-// 0,1,0  00FF00 = Neon Green
-// 1,1,0  FFFF00 = Neon Yellow
-// 1,.2,0 FF3300 = Neon Orange
-// 1,0,0  FF0009 = Neon Red
-// .5,0,1 6600FF = Neon Purple
-// 0,1,.6 00FF99 = Neon Mint Green
-// 0,0,.8 0000BF = Neon Dark Blue
-// 0,0,1  0000FF = Neon Blue
-// 0,1,1  00FFFF = Light Blue
-
-Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,0},{1,0,0},{.5,0,1},{0,1,.6},{0,0,.5},{0,0,1},{0,1,1}};
-int global_colors_number = 10;
+Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{0,0,1},{0,1,1}};
+int global_colors_number = 8;
 
 Trail trails[TRAIL_MAX];
 float trail_x_move = .05;

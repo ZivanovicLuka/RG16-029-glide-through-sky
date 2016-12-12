@@ -39,6 +39,7 @@ int main(int argc, char* argv[]){
   glEnable(GL_DEPTH_TEST);
 
   glutKeyboardFunc(on_keyboard);
+  glutPassiveMotionFunc(on_mouse_move);
   glutReshapeFunc(on_reshape);
   glutDisplayFunc(on_display);
 
@@ -108,9 +109,46 @@ static void on_keyboard(unsigned char key, int x, int y) {
     }
 }
 
+
+static void on_mouse_move(int x, int y){
+  float xf = (float)x/window_height*((float)window_width/window_height) - .5*(float)(window_width*window_width)/(window_height*window_height);
+  xf*=1.6; 
+  // float xf = (float)x*2/window_height - 1;
+  float yf = (float)-y*2/window_height + 1;
+  float dx,dy;
+
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+    if(!enemies[i].alive)
+      continue;
+
+
+    dx = xf - enemies[i].x_aim;
+    dy = yf - (enemies[i].y_aim + 0.04); // body height / 2
+
+    
+    float angle = atan2(dy,dx)*180/M_PI;
+
+    if(angle>=0 && angle<=180)
+      enemies[i].angle = angle;
+    else if(angle < -90)
+      enemies[i].angle = 180;
+    else
+      enemies[i].angle = 0; 
+
+    printf("mouse: (%f~%f) , player: (%f~%f) , dxdy(%f~%f)\n", xf, yf, enemies[i].x_curr, enemies[i].y_curr, dx, dy);
+    printf("(%f)\n",angle);
+  }
+  //p.rot_ud = 180*(y-SCREEN_HEIGHT)/SCREEN_HEIGHT-90;
+  //p.rot_lr = 2*360*x/SCREEN_WIDTH;
+}
+
 static void on_reshape(int width, int height){
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
+
+  window_height = height;
+  window_width = width;
 
   int left = (width - height) / 2;
   glViewport(left, 0, height, height);
@@ -142,7 +180,7 @@ static void on_timer(int value){
       if(world.distance>=1.5){
         world.distance-=1.3;
         summon_wall();
-        summon_enemy();
+        summon_enemy(0); // rand 0, 1 ,2
         // printf("%d\n",walls_passed_counter);
         if((walls_passed_counter = (walls_passed_counter+1)%4) == 0)
           summon_mana();
@@ -184,12 +222,14 @@ static void on_timer(int value){
     }
 }
 
+// float global_transform_matrix[16];
+
 void on_display(){
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  fps(1);
+  // fps(1);
 
   /* Pozicija svetla (u pitanju je direkcionalno svetlo). */
-  GLfloat light_position[] = { 0, 0, 3.55, 1 };
+  GLfloat light_position[] = { 0, 0, 2.45, 1 };
 
   GLfloat light_ambient[] = { 0.1, 0.1, 0.1, 1 };
   GLfloat light_diffuse[] = { 0.7, 0.7, 0.7, 1 };
@@ -204,6 +244,7 @@ void on_display(){
   /* Podesava se vidna tacka. */
   gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
 
+  glEnable(GL_NORMALIZE);
   /* Ukljucuje se osvjetljenje i podesavaju parametri svetla. */
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
@@ -219,6 +260,9 @@ void on_display(){
   glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
   glMatrixMode(GL_MODELVIEW);
+  
+  // glGetFloatv(GL_MODELVIEW_MATRIX, global_transform_matrix);
+
   glLoadIdentity();
 
   draw_world();
@@ -237,7 +281,7 @@ void on_display(){
     draw_mana_crystal(i);
 
     draw_wall(walls[i].x_curr,i);
-    draw_enemy(enemies[i].x_curr,enemies[i].y_curr,1,0,0,enemies[i].alive);
+    draw_enemy(i);
   }
 
   teleport();
