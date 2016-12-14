@@ -2,6 +2,7 @@
   #define MANA_H
 
   void draw_mana_crystal();
+  void draw_mana_bar(int mana);
   void summon_mana();
 
   typedef struct {

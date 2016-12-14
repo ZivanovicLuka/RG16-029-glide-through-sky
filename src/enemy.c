@@ -9,6 +9,7 @@
 #include "enemy.h"
 
 Enemy enemies[WALL_COUNT]; // moze biti na zidu samo
+// Bullet bullets[WALL_COUNT][BULLETS_COUNT];
 
 float bullet_dmg = 10;
 int enemy_summon_index = 0;
@@ -24,22 +25,6 @@ void enemies_init(){
 void summon_enemy(int level){
   enemy_summon_index = (++enemy_summon_index == WALL_COUNT) ? 0 : enemy_summon_index;
   int index = enemy_summon_index;
-
-  //jump = enemy_gap * nesto;
-
-  // if(level == 0){
-  //   enemies[index].colorR = 0;
-  //   enemies[index].colorG = 1;
-  //   enemies[index].colorB = 0;
-  // } else if(level == 1){
-  //   enemies[index].colorR = 1;
-  //   enemies[index].colorG = 1;
-  //   enemies[index].colorB = 0;
-  // } else {
-  //   enemies[index].colorR = 1;
-  //   enemies[index].colorG = 0;
-  //   enemies[index].colorB = 0;
-  // }
 
   enemies[index].x_curr = walls[index].x_curr;
   enemies[index].y_curr = walls[index].y_top + .05; // fix
@@ -142,7 +127,7 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
       diffuse_coeffs[1] = colorG;
       diffuse_coeffs[2] = colorB;
       glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
-      
+
       glTranslatef(.5+gun_width/gun_length/2,0,0);
       glScalef(1/gun_length,1/gun_width,1/gun_width);
       glutSolidCube(gun_width);

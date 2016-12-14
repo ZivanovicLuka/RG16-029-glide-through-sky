@@ -50,15 +50,25 @@ int main(int argc, char* argv[]){
   score_init();
   wall_init();
 
+  // TODO player init //
+
+  // int global_colors_number = 8;
+  // Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{0,0,1},{0,1,1}};
+
+  player.colors = global_colors[(int)(rand()/(float)RAND_MAX * global_colors_number)];
+  //////////////////////
+
   // TODO trails update ////////////////////
   trails[0].pos_x = player.x_curr;
   trails[0].pos_y = 0;
   trails[0].pos_z = -.4;
+  trails[0].size = player.size * .3;
   trails[0].colors = trail_color_alpha;
 
   int i;
   for(i=1; i<TRAIL_MAX; i++){
     trails[i].pos_x = trails[i-1].pos_x - trail_x_move;
+    // printf("%f\n", trails[i].pos_x);
     trails[i].pos_y = 0;
     trails[i].pos_z = trails[i-1].pos_z + .001;
     trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
@@ -112,7 +122,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
 
 static void on_mouse_move(int x, int y){
   float xf = (float)x/window_height*((float)window_width/window_height) - .5*(float)(window_width*window_width)/(window_height*window_height);
-  xf*=1.6; 
+  xf*=1.6;
   // float xf = (float)x*2/window_height - 1;
   float yf = (float)-y*2/window_height + 1;
   float dx,dy;
@@ -126,7 +136,7 @@ static void on_mouse_move(int x, int y){
     dx = xf - enemies[i].x_aim;
     dy = yf - (enemies[i].y_aim + 0.04); // body height / 2
 
-    
+
     float angle = atan2(dy,dx)*180/M_PI;
 
     if(angle>=0 && angle<=180)
@@ -134,10 +144,10 @@ static void on_mouse_move(int x, int y){
     else if(angle < -90)
       enemies[i].angle = 180;
     else
-      enemies[i].angle = 0; 
+      enemies[i].angle = 0;
 
-    printf("mouse: (%f~%f) , player: (%f~%f) , dxdy(%f~%f)\n", xf, yf, enemies[i].x_curr, enemies[i].y_curr, dx, dy);
-    printf("(%f)\n",angle);
+    // printf("mouse: (%f~%f) , player: (%f~%f) , dxdy(%f~%f)\n", xf, yf, enemies[i].x_curr, enemies[i].y_curr, dx, dy);
+    // printf("(%f)\n",angle);
   }
   //p.rot_ud = 180*(y-SCREEN_HEIGHT)/SCREEN_HEIGHT-90;
   //p.rot_lr = 2*360*x/SCREEN_WIDTH;
@@ -260,7 +270,7 @@ void on_display(){
   glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
   glMatrixMode(GL_MODELVIEW);
-  
+
   // glGetFloatv(GL_MODELVIEW_MATRIX, global_transform_matrix);
 
   glLoadIdentity();
@@ -270,9 +280,7 @@ void on_display(){
   // Kolizija igraca i zidova
   int i;
   for(i=0;i<WALL_COUNT;i++){
-    if(!player.invulnerable){
-      wall_collision(i);
-    }
+    wall_collision(i);
     mana_collision(i);
   }
 
@@ -291,13 +299,14 @@ void on_display(){
   }
 
   draw_mana_bar(player.mana);
-  draw_player(player.y_curr, player.x_curr, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
+  draw_player(player.x_curr, player.y_curr, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
 
   for(i=0;i<trail_count;i++){
-    draw_player(trails[i].pos_y, trails[i].pos_x, // TODO crtaj trouglove, opacity, itd
+    draw_trail(trails[i].pos_x, trails[i].pos_y, // TODO crtaj trouglove, opacity, itd
       player.colors.R * trails[i].colors,
       player.colors.G * trails[i].colors,
-      player.colors.B * trails[i].colors);
+      player.colors.B * trails[i].colors,
+      trails[i].size);
   }
 
 // TODO Svasta sa ispisom teksta, pocevsi od plate-a pa na dalje

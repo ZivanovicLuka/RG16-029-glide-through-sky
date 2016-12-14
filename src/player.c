@@ -29,11 +29,11 @@ Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{
 int global_colors_number = 8;
 
 Trail trails[TRAIL_MAX];
-float trail_x_move = .05;
+float trail_x_move = .04;
 float trail_color_alpha = 1;
 int trail_count = -5;
 
-void draw_player(float y, float x, float colorR, float colorG, float colorB){
+void draw_player(float x, float y, float colorR, float colorG, float colorB){
 
   GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
@@ -63,8 +63,13 @@ void wall_collision(int index){
 
   if((PLAYER_top >= wall_bot && PLAYER_left <= wall_right && PLAYER_right >= wall_left) ||
   (PLAYER_bot <= wall_top && PLAYER_left <= wall_right && PLAYER_right >= wall_left)){
+    if(!player.invulnerable){
      exit(0);
-     return;
+    } else {
+      walls[index].hollow = 1;
+      walls[index].hole_y = player.y_curr;
+    }
+   return;
   }
 }
 
@@ -143,10 +148,28 @@ void summon_trail(){
 
   for(i=n-1; i>=1; i--){
     trails[i].pos_y = trails[i-1].pos_y;
+    trails[i].size = trails[i-1].size;
   }
 
-  trails[0].pos_y = player.y_curr;
+  float dy = rand()/(float)RAND_MAX * player.size - player.size/2;
+
+  trails[0].pos_y = player.y_curr + dy;
+  trails[0].size = (rand()/(float)RAND_MAX * .3 + .4)* player.size;
 
   if(trail_count < TRAIL_MAX)
     trail_count++;
+}
+
+void draw_trail(float x, float y, float colorR, float colorG, float colorB, float size){
+
+  rand()/(float)RAND_MAX * player.size - player.size/2;
+  GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
+  glPushMatrix();
+      glTranslatef(x,y,0);
+      glScalef(size,size,size);
+      glutSolidCube(1);
+  glPopMatrix();
+  glutPostRedisplay();
 }

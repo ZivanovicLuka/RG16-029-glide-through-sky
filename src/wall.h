@@ -16,6 +16,8 @@
     float colorR;
     float colorG;
     float colorB;
+    int hollow;
+    float hole_y;
   } Wall;
 
 #endif

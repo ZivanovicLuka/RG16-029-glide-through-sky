@@ -1,7 +1,8 @@
 #ifndef PLAYER_H
   #define PLAYER_H
 
-  void draw_player(float y, float x, float R, float G, float B);
+  void draw_player(float x, float y, float R, float G, float B);
+  void draw_trail(float x, float y, float R, float G, float B, float size);
   void wall_collision(int index);
   void mana_collision();
   void dash();
@@ -17,8 +18,8 @@
   #define DASH_TIMER_INTERVAL 350
 
   #define TRAIL_TIMER_ID 2
-  #define TRAIL_TIMER_INTERVAL 60
-  #define TRAIL_MAX 5
+  #define TRAIL_TIMER_INTERVAL 40
+  #define TRAIL_MAX 12
 
   typedef struct {
     float R;
@@ -26,6 +27,7 @@
     float B;
   } Color3f;
 
+  Color3f global_colors[8]; // TODO konstanta
   int global_colors_number;
 
   typedef struct {
@@ -44,6 +46,7 @@
     float pos_y;
     float pos_z;
     float colors;
+    float size;
   } Trail;
 
   float trail_x_move;
