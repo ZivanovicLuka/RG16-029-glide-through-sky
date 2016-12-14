@@ -281,15 +281,16 @@ void on_display(){
   int i;
   for(i=0;i<WALL_COUNT;i++){
     wall_collision(i);
-    mana_collision(i);
+    enemy_collision(i);
   }
+  mana_collision(i);
 
   // TODO jedan mana kristala
   for(i=0;i<WALL_COUNT;i++){ // sigurno je manje kristala od zidova (ili jednako)
     draw_mana_crystal(i);
 
     draw_wall(walls[i].x_curr,i);
-    draw_enemy(i);
+    draw_enemy(i,speed_correction);
   }
 
   teleport();

@@ -10,6 +10,8 @@
 #include "world_externs.h"
 #include "mana.h"
 #include "mana_externs.h"
+#include "enemy.h"
+#include "enemy_externs.h"
 
 
 Player player = {
@@ -77,12 +79,12 @@ void mana_collision(){
   if(!crystal.alive)
     return;
 
-  float mana_width = 0.085; // 0.06 * sqrt(2), posto je dijagonala
+  float mana_height = 0.085; // 0.06 * sqrt(2), posto je dijagonala
 
-  float mana_bot = crystal.curr_y - mana_width/2;
-  float mana_top = crystal.curr_y + mana_width/2;
-  float mana_left = crystal.curr_x - mana_width/2;
-  float mana_right = crystal.curr_x + mana_width/2;
+  float mana_bot = crystal.curr_y - mana_height/2;
+  float mana_top = crystal.curr_y + mana_height/2;
+  float mana_left = crystal.curr_x - mana_height/2;
+  float mana_right = crystal.curr_x + mana_height/2;
 
   float PLAYER_bot = player.y_curr - player.size/2;
   float PLAYER_top = player.y_curr + player.size/2;
@@ -96,6 +98,33 @@ void mana_collision(){
         player.mana++;
 
       crystal.alive = 0;
+      return;
+  }
+}
+
+void enemy_collision(int index){
+  if(enemies[index].alive != 1)
+    return;
+
+  float enemy_height = 0.14; // TODO iz enemy.c
+  float enemy_width = 0.16;
+
+  float enemy_bot = enemies[index].y_curr - enemy_height/2;
+  float enemy_top = enemies[index].y_curr + enemy_height/2;
+  float enemy_left = enemies[index].x_curr - enemy_height/2;
+  float enemy_right = enemies[index].x_curr + enemy_height/2;
+
+  float PLAYER_bot = player.y_curr - player.size/2;
+  float PLAYER_top = player.y_curr + player.size/2;
+  float PLAYER_left = player.x_curr - player.size/2;
+  float PLAYER_right = player.x_curr + player.size/2;
+
+  if(PLAYER_top >= enemy_bot && PLAYER_left <= enemy_right && PLAYER_right >= enemy_left &&
+  PLAYER_bot <= enemy_top){
+     if(player.dashing){
+        enemies[index].alive = DYING;
+        enemies[index].dying_time = 0;
+     }
       return;
   }
 }

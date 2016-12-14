@@ -5,7 +5,7 @@
   void summon_wall();
   void wall_init();
 
-  #define WALL_COUNT 3
+  #define WALL_COUNT 4
 
   typedef struct {
     float x_curr;

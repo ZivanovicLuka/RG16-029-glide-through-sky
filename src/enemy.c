@@ -29,11 +29,12 @@ void summon_enemy(int level){
   enemies[index].x_curr = walls[index].x_curr;
   enemies[index].y_curr = walls[index].y_top + .05; // fix
   enemies[index].alive = 1;
+  enemies[index].dying_time = 0;
   enemies[index].pass = 0;
 }
 
 
-void draw_enemy(int index){//float x, float y, float colorR, float colorG, float colorB, int alive, float angle){
+void draw_enemy(int index, float speed_correction){//float x, float y, float colorR, float colorG, float colorB, int alive, float angle){
   if(!enemies[index].alive)
     return;
 
@@ -57,6 +58,12 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
   // float topColorG = enemies[index].colorG;
   // float topColorB = enemies[index].colorB;
   float angle = enemies[index].angle;
+  float y_dying_speed = 0;
+
+  if(enemies[index].alive == DYING){
+    enemies[index].dying_time += .0035*speed_correction;
+    angle = enemies[index].dying_time*700;
+  }
 
   glPushMatrix();
 
@@ -67,24 +74,33 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
 
       glTranslatef(x,y,0);
       glScalef(1,body_height/body_width,1);
-      glutSolidCube(body_width);
+      if(enemies[index].alive!= DYING)
+        glutSolidCube(body_width); // TELO TENKA
       glScalef(1,body_width/body_height,1);
-/////
+
 
        diffuse_coeffs[0] = .4 * colorR;
        diffuse_coeffs[1] = .4 * colorG;
        diffuse_coeffs[2] = .4 * colorB;
        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
-      glTranslatef(0,(body_height+top_height)/2, top_part_width/2 + gun_width/2);
+      glTranslatef(enemies[index].dying_time*.7,
+                  (body_height+top_height)/2 + enemies[index].dying_time,
+                   top_part_width/2 + gun_width/2 + enemies[index].dying_time);
       glScalef(top_width,top_height,top_part_width);
-      glutSolidCube(1);
+      glRotatef(enemies[index].alive == DYING ? angle : 0,1,0,0);
+      glutSolidCube(1); // DEO OKO PUSKE
+      glRotatef(enemies[index].alive == DYING ? -angle : 0,1,0,0);
       glScalef(1/top_width,1/top_height,1/top_part_width);
 
 
-      glTranslatef(0,0,-top_part_width - gun_width);
+      glTranslatef(0,
+                   0,
+                   -top_part_width - gun_width - 2*enemies[index].dying_time);
       glScalef(top_width,top_height,top_part_width);
-      glutSolidCube(1);
+      glRotatef(enemies[index].alive == DYING ? angle : 0,1,0,0);
+      glutSolidCube(1); // DEO OKO PUSKE
+      glRotatef(enemies[index].alive == DYING ? -angle : 0,1,0,0);
       glScalef(1/top_width,1/top_height,1/top_part_width);
 
       // float global[] = {x,y,0,1};
@@ -93,7 +109,7 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
       // dx = xf - global[0];
       // dy = yf - global[1];
 
-      glTranslatef(0,0,top_part_width/2 + gun_width/2);
+      glTranslatef(0,0,top_part_width/2 + gun_width/2 + enemies[index].dying_time);
 
       // glPushMatrix();
       //   glLoadMatrixf(global_transform_matrix);
@@ -117,10 +133,13 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
        diffuse_coeffs[2] = .3;
        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
+      // if(enemies[index].alive == DYING)
+      //     glTranslatef(enemies[index].dying_time,y_dying_speed,0);
       glRotatef(angle,0,0,1);
       glScalef(gun_length,gun_width,gun_width);
-      glTranslatef(.5,0,0);
-      glutSolidCube(1);
+      if(enemies[index].alive != DYING)
+        glTranslatef(.5,0,0);
+      glutSolidCube(1); // PUSKA
 
 
       diffuse_coeffs[0] = colorR;
@@ -130,7 +149,7 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
 
       glTranslatef(.5+gun_width/gun_length/2,0,0);
       glScalef(1/gun_length,1/gun_width,1/gun_width);
-      glutSolidCube(gun_width);
+      glutSolidCube(gun_width); // VRH PUSKE
 
 
   glPopMatrix();

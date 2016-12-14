@@ -1,9 +1,10 @@
 #ifndef ENEMY_H
   #define ENEMY_H
 
-  #define BULLETS_COUNT
+  #define BULLETS_COUNT 4
+  #define DYING 2
 
-  void draw_enemy(int index);//float y, float x, float colorR, float colorG, float colorB, int alive, float angle);
+  void draw_enemy(int index, float speed_correction);//float y, float x, float colorR, float colorG, float colorB, int alive, float angle);
   void summon_enemy();
 
   typedef struct {
@@ -12,6 +13,7 @@
     int alive;
     int pass;
     float angle;
+    float dying_time;
     float x_aim;
     float y_aim;
   } Enemy;
