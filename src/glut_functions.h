@@ -5,7 +5,6 @@
   static void on_timer(int value);
   static void on_display(void);
   static void on_keyboard(unsigned char key, int x, int y);
-  static void on_mouse_move(int x, int y);
   static void on_reshape(int width, int height);
   static void onDisplay(void);
   static void updateDeltaTime(void);

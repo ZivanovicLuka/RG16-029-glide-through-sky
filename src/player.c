@@ -66,6 +66,7 @@ void wall_collision(int index){
   if((PLAYER_top >= wall_bot && PLAYER_left <= wall_right && PLAYER_right >= wall_left) ||
   (PLAYER_bot <= wall_top && PLAYER_left <= wall_right && PLAYER_right >= wall_left)){
     if(!player.invulnerable){
+      printf("Score: %d\n", world.score);
      exit(0);
     } else {
       walls[index].hollow = 1;
@@ -124,6 +125,7 @@ void enemy_collision(int index){
      if(player.dashing){
         enemies[index].alive = DYING;
         enemies[index].dying_time = 0;
+        player.mana += (int)rand()/(float)RAND_MAX * 2.8;
      }
       return;
   }

@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
 #include "player.h"
+#include "player_externs.h"
 #include "wall.h"
 #include "wall_externs.h"
 #include "enemy.h"
@@ -19,6 +21,7 @@ void enemies_init(){
   for(i=0; i<WALL_COUNT; i++){
       enemies[i].pass = 1;
       enemies[i].alive = 0;
+      enemies[i].rotation = 0;
   }
 }
 
@@ -26,15 +29,23 @@ void summon_enemy(int level){
   enemy_summon_index = (++enemy_summon_index == WALL_COUNT) ? 0 : enemy_summon_index;
   int index = enemy_summon_index;
 
+  if(rand()/(float)RAND_MAX < .4)
+    enemies[index].rotation = -1;
+  else
+    enemies[index].rotation = 1;
+
   enemies[index].x_curr = walls[index].x_curr;
-  enemies[index].y_curr = walls[index].y_top + .05; // fix
+  if(enemies[index].rotation == 1)
+    enemies[index].y_curr = walls[index].y_top + .05; // fix
+  else
+    enemies[index].y_curr = walls[index].y_bot - .05; // fix
   enemies[index].alive = 1;
   enemies[index].dying_time = 0;
   enemies[index].pass = 0;
 }
 
 
-void draw_enemy(int index, float speed_correction){//float x, float y, float colorR, float colorG, float colorB, int alive, float angle){
+void draw_enemy(int index){//float x, float y, float colorR, float colorG, float colorB, int alive, float angle){
   if(!enemies[index].alive)
     return;
 
@@ -61,7 +72,6 @@ void draw_enemy(int index, float speed_correction){//float x, float y, float col
   float y_dying_speed = 0;
 
   if(enemies[index].alive == DYING){
-    enemies[index].dying_time += .0035*speed_correction;
     angle = enemies[index].dying_time*700;
   }
 
@@ -73,6 +83,8 @@ void draw_enemy(int index, float speed_correction){//float x, float y, float col
       glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
       glTranslatef(x,y,0);
+      if(enemies[index].rotation == -1)
+        glRotatef(180,1,0,0);
       glScalef(1,body_height/body_width,1);
       if(enemies[index].alive!= DYING)
         glutSolidCube(body_width); // TELO TENKA
@@ -111,20 +123,8 @@ void draw_enemy(int index, float speed_correction){//float x, float y, float col
 
       glTranslatef(0,0,top_part_width/2 + gun_width/2 + enemies[index].dying_time);
 
-      // glPushMatrix();
-      //   glLoadMatrixf(global_transform_matrix);
-      //   float aim[] = {x,y,0,0};
-      //   glMultMatrixf(aim);
-      //   float aim_ret[16];
-      //   glGetFloatv(GL_MODELVIEW_MATRIX, aim_ret);
-
-      //   enemies[index].x_aim = aim_ret[0];
-      //   enemies[index].y_aim = aim_ret[1];
-      //   // printf("%f %f\n",aim[1],aim_ret[1]);
-      // glPopMatrix();
-
-        enemies[index].x_aim = enemies[index].x_curr;
-        enemies[index].y_aim = enemies[index].y_curr;
+      enemies[index].x_aim = enemies[index].x_curr;
+      enemies[index].y_aim = enemies[index].y_curr;
 
 //////
 
@@ -135,6 +135,8 @@ void draw_enemy(int index, float speed_correction){//float x, float y, float col
 
       // if(enemies[index].alive == DYING)
       //     glTranslatef(enemies[index].dying_time,y_dying_speed,0);
+      if(enemies[index].rotation == -1)
+        angle = -angle;
       glRotatef(angle,0,0,1);
       glScalef(gun_length,gun_width,gun_width);
       if(enemies[index].alive != DYING)
@@ -154,4 +156,47 @@ void draw_enemy(int index, float speed_correction){//float x, float y, float col
 
   glPopMatrix();
   glutPostRedisplay();
+}
+
+void aim(){
+  float dx,dy;
+
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+    if(!enemies[i].alive)
+      continue;
+
+    dx = player.x_curr + .3 - enemies[i].x_aim; // gadja ispred
+    dy = player.y_curr - (enemies[i].y_aim + 0.04); // body height / 2
+
+    float angle_goal = atan2(dy,dx)*180/M_PI;
+    float angle = enemies[i].angle;
+
+    if(enemies[i].rotation == 1){
+      if(angle_goal>= 0){
+        if(angle_goal > angle + 10)
+          angle += 4;
+        else if(angle_goal < angle - 10 )
+          angle -= 4;
+      } else if(angle>=4 && angle <= 176) {
+        if(angle<90)
+          angle -= 4;
+        else
+          angle += 4;
+      }
+    } else {
+      if(angle_goal<= 0){
+        if(angle_goal < angle - 10)
+          angle -= 4;
+        else if(angle_goal > angle + 10 )
+          angle += 4;
+      } else if(angle<=-4 && angle >= -176) {
+        // if(angle<90)
+        //   angle += 4;
+        // else
+        //   angle -= 4;
+      }
+    }
+    enemies[i].angle = angle;
+  }
 }
