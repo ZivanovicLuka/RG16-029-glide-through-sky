@@ -21,7 +21,8 @@ World world = {
   .027,  // world.jump
   0,     // world.score
   0,     // world.distance
-  0      // world.animation_ongoing
+  0,      // world.animation_ongoing
+  0      // world.time
 };
 
 float distance = 0;

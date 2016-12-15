@@ -33,6 +33,7 @@
     int score;
     float distance;
     int animation_ongoing;
+    float time;
   } World;
 
 #endif

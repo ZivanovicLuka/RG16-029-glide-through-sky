@@ -5,11 +5,13 @@
   void draw_trail(float x, float y, float R, float G, float B, float size);
   void wall_collision(int index);
   void mana_collision();
+  void enemy_collision(int index);
   void dash();
   void dash_start();
   void teleport();
   void player_move();
   void summon_trail();
+  
 
   #define PLAYER_REFRESH_TIMER_ID 0
   #define PLAYER_REFRESH_TIMER_INTERVAL 10

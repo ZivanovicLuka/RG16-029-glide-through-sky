@@ -8,7 +8,9 @@
   static void on_reshape(int width, int height);
   static void onDisplay(void);
   static void updateDeltaTime(void);
-  int dt;
+  void RenderString(float x, float y, void *font, const char* string, float r, float g, float b);
   static void fps(int print);
+
+  int dt;
 
 #endif

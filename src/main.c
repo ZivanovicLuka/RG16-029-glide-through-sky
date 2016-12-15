@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
 //==============================================================================
 
@@ -147,10 +148,17 @@ static void on_timer(int value){
       updateDeltaTime();
 
       speed_correction = dt / (float)PLAYER_REFRESH_TIMER_INTERVAL;
-      // printf("%lf\n",speed_correction);
-      // printf("%.2f %f %d\n",speed_correction, dt, PLAYER_REFRESH_TIMER_INTERVAL);
       float ms = wall_speed * speed_correction;
-
+      
+      world.time += ms;
+      if(mana_init<3){
+        mana_init_time+=ms;
+        if(mana_init_time > 30*ms){
+          mana_init++;
+          player.mana++;
+          mana_init_time-= 30*ms;
+        }
+      }
       if(world.distance>=1.5){
         world.distance-=1.3;
         summon_wall();
@@ -259,7 +267,7 @@ void on_display(){
     dash();
   }
 
-  draw_mana_bar(player.mana);
+  draw_mana_circle(player.mana);
   draw_player(player.x_curr, player.y_curr, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
 
   for(i=0;i<trail_count;i++){

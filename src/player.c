@@ -22,7 +22,7 @@ Player player = {
   {1,   //player.colorR
   0,   //player.colorG
   1},   //player.colorB
-  3,   //player.mana
+  0,   //player.mana
   0,   //player.invulnerable
   0    //player.dashing
 };

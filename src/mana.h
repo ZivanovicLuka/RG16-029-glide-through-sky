@@ -2,7 +2,7 @@
   #define MANA_H
 
   void draw_mana_crystal();
-  void draw_mana_bar(int mana);
+  void draw_mana_circle(int mana);
   void summon_mana();
 
   typedef struct {
@@ -14,5 +14,7 @@
 
   float mana_crystal_rotation;
   int walls_passed_counter;
+  float mana_init_time;
+  float mana_init;
 
 #endif

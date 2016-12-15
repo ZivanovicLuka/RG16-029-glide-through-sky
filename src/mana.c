@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
 #include "wall.h"
 #include "mana.h"
@@ -9,8 +10,13 @@
 #include "player.h"
 #include "player_externs.h"
 
+#include "world.h"
+#include "world_externs.h"
+
 Crystal crystal; //nece biti vise zivih kristala od zidova sigurno
 float mana_crystal_rotation = 30;
+float mana_init_time=0;
+float mana_init=0;
 int walls_passed_counter = 0;
 
 void summon_mana(int index){
@@ -64,35 +70,57 @@ void draw_mana_crystal(){
   }
 }
 
-void draw_mana_bar(int mana){
+void draw_mana_circle(int mana){
+  if(mana == 0)
+    return;
+
   float height = .02;
 
-  float small_width = .08;
+  float small_width = .1;
+  if(mana>5)
+    small_width = .05;
 
-  float start_x = -.9;
-  float y = .92;
-  float z = .3;
+  float x_center = player.x_curr;
+  float y_center = player.y_curr;
+  float z = 0;//-player.size;
 
-  // GLfloat emission_coeffs[] = { 0, 0, 1, 1 };
-  GLfloat diffuse_coeffs[] = { 0, 0, 1, 1 };
-  GLfloat specular_coeffs[] = { 0, 0.05, 1, 1 };
-
-
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
-  // glMaterialfv(GL_FRONT, GL_EMISSION, specular_coeffs);
-  glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
+  
+  GLfloat emission_coeffs[] = { .1, .1, .3, 1 };
+  GLfloat diffuse_coeffs[4];// = { player.colors.R*.4, player.colors.G*.4, player.colors.B*.4, 1 };
+  GLfloat specular_coeffs[] = { 0, 0, 1, 1 };
 
 
+  // glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+  // glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
+
+  float rotate_angle = 360 / mana;
+  float t = -world.time*350;
+  float r = .13; 
+
+  float x,y;
   int i;
   for(i=0;i<mana;i++){
 
+    diffuse_coeffs[0] = player.colors.R*(i+1)/mana;
+    diffuse_coeffs[1] = player.colors.G*(i+1)/mana;
+    diffuse_coeffs[2] = player.colors.B*(i+1)/mana;
+    diffuse_coeffs[3] = 1;
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
+    x = r * cos(t/180*M_PI);
+    y = r * sin(t/180*M_PI);
+
     glPushMatrix();
-        glTranslatef(start_x + i*small_width, y, z);
-        glScalef(small_width*0.8 ,height,.001);
+        
+        glTranslatef(x_center + x, y_center + y, z);
+        glRotatef(t + 90,0,0,1);
+        glScalef(small_width*0.8 ,height,.01);
         glutSolidCube(1);
     glPopMatrix();
-
+    
+    t += rotate_angle;
   }
+
   // emission_coeffs[0] = 0;
   // emission_coeffs[1] = 0;
   // emission_coeffs[2] = 0;
