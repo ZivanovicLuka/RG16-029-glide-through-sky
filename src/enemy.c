@@ -9,11 +9,12 @@
 #include "wall.h"
 #include "wall_externs.h"
 #include "enemy.h"
+#include "bullet.h"
+#include "bullet_externs.h"
 
 Enemy enemies[WALL_COUNT]; // moze biti na zidu samo
-// Bullet bullets[WALL_COUNT][BULLETS_COUNT];
 
-float bullet_dmg = 10;
+float range = 2;
 int enemy_summon_index = 0;
 
 void enemies_init(){
@@ -22,10 +23,11 @@ void enemies_init(){
       enemies[i].pass = 1;
       enemies[i].alive = 0;
       enemies[i].rotation = 0;
+      enemies[i].bullet_index = 0;
   }
 }
 
-void summon_enemy(int level){
+void summon_enemy(){
   enemy_summon_index = (++enemy_summon_index == WALL_COUNT) ? 0 : enemy_summon_index;
   int index = enemy_summon_index;
 
@@ -44,6 +46,38 @@ void summon_enemy(int level){
   enemies[index].pass = 0;
 }
 
+int in_range(int index){
+  float x1 = enemies[index].x_curr;
+  float y1 = enemies[index].y_curr;
+  float x2 = player.x_curr;
+  float y2 = player.y_curr;
+  if(sqrt(pow(x2-x1,2)+pow(y2-y1,2))<range)
+    return 1;
+  return 0;
+}
+
+void fire(int index){
+  // printf("%i\n",!in_range(index));
+  if(in_range(index) && enemies[index].alive){
+    // enemies[index].alive = 2;
+    int bullet_index = enemies[index].bullet_index;
+    bullets[index][bullet_index].angle = enemies[index].angle;
+    float vx = cos(enemies[index].angle/180.0*M_PI);
+    float vy = sin(enemies[index].angle/180.0*M_PI);
+    float vector = sqrt(pow(vx ,2) + pow(vy,2));
+    bullets[index][bullet_index].v_x = vx/vector;
+    bullets[index][bullet_index].v_y = vy/vector;
+    bullets[index][bullet_index].x_curr = enemies[index].x_curr + 
+                                          bullets[index][bullet_index].v_x*0.15;
+    bullets[index][bullet_index].y_curr = enemies[index].y_curr + 
+                                          bullets[index][bullet_index].v_y*0.15 +
+                                          enemies[index].rotation*(0.04 + 0.03);
+    bullets[index][bullet_index].alive = 1;
+
+    enemies[index].bullet_index = (++bullet_index == BULLET_COUNT) ?
+                                  0 : bullet_index;
+  }
+}
 
 void draw_enemy(int index){//float x, float y, float colorR, float colorG, float colorB, int alive, float angle){
   if(!enemies[index].alive)
@@ -65,9 +99,6 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
   float colorR = walls[index].colorR * 0.9;
   float colorG = walls[index].colorG * 0.9;
   float colorB = walls[index].colorB * 0.9;
-  // float topColorR = enemies[index].colorR;
-  // float topColorG = enemies[index].colorG;
-  // float topColorB = enemies[index].colorB;
   float angle = enemies[index].angle;
   float y_dying_speed = 0;
 

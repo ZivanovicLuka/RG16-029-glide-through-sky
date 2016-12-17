@@ -4,8 +4,8 @@ CFLAGS  = -g -Wall -I/usr/X11R6/include -I/usr/pkg/include
 LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib
 LDLIBS  = -lglut -lGLU -lGL -lm
 
-glideThroughSky: main.o world.o player.o wall.o mana.o enemy.o
-	$(CC) $(LDFLAGS) -o glideThroughSky.out main.o world.o player.o wall.o mana.o enemy.o $(LDLIBS)
+glideThroughSky: main.o world.o player.o wall.o mana.o enemy.o bullet.o
+	$(CC) $(LDFLAGS) -o glideThroughSky.out main.o world.o player.o wall.o mana.o enemy.o bullet.o $(LDLIBS)
 
 main.o:
 	$(CC) $(LDFLAGS) -c src/main.c $(LDLIBS)
@@ -25,6 +25,8 @@ mana.o:
 enemy.o:
 	$(CC) $(LDFLAGS) -c src/enemy.c $(LDLIBS)
 
+bullet.o:
+	$(CC) $(LDFLAGS) -c src/bullet.c $(LDLIBS)
 
 .PHONY: clean dist
 

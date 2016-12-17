@@ -1,9 +1,13 @@
 #ifndef WORLD_H
   #define WORLD_H
 
+  #define STAR_X_NUMBER 7
+  #define STAR_Y_NUMBER 8
+
   void check_score(int index);
   void draw_world();
   void score_init();
+  void stars_init();
 
   int window_width;
   int window_height;
@@ -35,5 +39,11 @@
     int animation_ongoing;
     float time;
   } World;
+
+  typedef struct {
+    float x_curr;
+    float y_curr;
+    float speed;
+  } Star;
 
 #endif

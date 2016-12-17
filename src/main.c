@@ -23,6 +23,9 @@
 #include "enemy.h"
 #include "enemy_externs.h"
 
+#include "bullet.h"
+#include "bullet_externs.h"
+
 //==============================================================================
 
 int main(int argc, char* argv[]){
@@ -46,6 +49,8 @@ int main(int argc, char* argv[]){
 
   srand(time(NULL));
 
+  bullets_init();
+  stars_init();
   score_init();
   wall_init();
 
@@ -132,6 +137,7 @@ static void on_reshape(int width, int height){
 }
 
 static void on_timer(int value){
+    int i,j;
     // TODO mozda stavi preko distance, nema potrebe za tajmerom
     if(value == TRAIL_TIMER_ID){
       summon_trail();
@@ -160,10 +166,14 @@ static void on_timer(int value){
         }
       }
       if(world.distance>=1.5){
+        
         world.distance-=1.3;
         summon_wall();
-        summon_enemy(0); // rand 0, 1 ,2
-        // printf("%d\n",walls_passed_counter);
+        summon_enemy(); 
+        for(i=0;i<WALL_COUNT;i++){
+         fire(i);
+         
+        }
         if((walls_passed_counter = (walls_passed_counter+1)%4) == 0)
           summon_mana();
       }
@@ -171,8 +181,15 @@ static void on_timer(int value){
 
       player_move();
       world.distance += ms;
+      
+      for(i=0;i<STAR_X_NUMBER;i++){
+        for(j=0;j<STAR_Y_NUMBER;j++){
+          stars[i][j].x_curr -= stars[i][j].speed;
+          if(stars[i][j].x_curr<-2)
+            stars[i][j].x_curr=2;
 
-      int i;
+        }  
+      }
       mana_collision(i);
       for(i=0;i<WALL_COUNT;i++){
         wall_collision(i);
@@ -192,6 +209,16 @@ static void on_timer(int value){
       crystal.curr_y = sin(mana_crystal_rotation*.02)*.08;
 
       aim();
+
+      for(i=0;i<WALL_COUNT;i++){
+        for(j=0;j<BULLET_COUNT;j++){
+          if(!bullets[i][j].alive)
+            continue;
+          bullets[i][j].x_curr-=ms;
+          bullets[i][j].x_curr+=bullets[i][j].v_x*.01;
+          bullets[i][j].y_curr+=bullets[i][j].v_y*.01;
+        }
+      }
 
       glutPostRedisplay();
 
@@ -253,12 +280,14 @@ void on_display(){
 
   draw_world();
 
-  int i;
+  int i,j;
   for(i=0;i<WALL_COUNT;i++){ // sigurno je manje kristala od zidova (ili jednako)
     draw_mana_crystal(i);
 
     draw_wall(walls[i].x_curr,i);
     draw_enemy(i);
+    for(j=0;j<BULLET_COUNT;j++)
+      draw_bullet(i,j);
   }
 
   teleport();

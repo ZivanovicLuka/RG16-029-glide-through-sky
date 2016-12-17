@@ -27,7 +27,7 @@ Player player = {
   0    //player.dashing
 };
 
-Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{0,0,1},{0,1,1}};
+Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{.3,.2,1},{0,1,1}};
 int global_colors_number = 8;
 
 Trail trails[TRAIL_MAX];
@@ -125,7 +125,7 @@ void enemy_collision(int index){
      if(player.dashing){
         enemies[index].alive = DYING;
         enemies[index].dying_time = 0;
-        player.mana += (int)rand()/(float)RAND_MAX * 2.8;
+        player.mana += (int)rand()/(float)RAND_MAX * 1.3 + .8;
      }
       return;
   }

@@ -7,6 +7,8 @@
   void draw_enemy(int index);//float y, float x, float colorR, float colorG, float colorB, int alive, float angle);
   void summon_enemy();
   void aim();
+  void fire(int index);
+  int in_range(int index);
 
   typedef struct {
     float x_curr;
@@ -18,16 +20,9 @@
     float x_aim;
     float y_aim;
     int rotation;
+    int bullet_index;
   } Enemy;
 
-  typedef struct{
-    float x_curr;
-    float y_curr;
-    float angle;
-    int alive;
-  } Bullet;
-
-  float bullet_dmg;
   int enemy_summon_index;
 
 #endif
