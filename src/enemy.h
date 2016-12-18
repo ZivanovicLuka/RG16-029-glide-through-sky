@@ -11,8 +11,8 @@
   int in_range(int index);
 
   typedef struct {
-    float x_curr;
-    float y_curr;
+    float curr_x;
+    float curr_y;
     int alive;
     int pass;
     float angle;

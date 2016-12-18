@@ -80,8 +80,8 @@ void draw_mana_circle(int mana){
   if(mana>5)
     small_width = .05;
 
-  float x_center = player.x_curr;
-  float y_center = player.y_curr;
+  float x_center = player.curr_x;
+  float y_center = player.curr_y;
   float z = 0;//-player.size;
 
   

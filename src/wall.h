@@ -8,7 +8,7 @@
   #define WALL_COUNT 4
 
   typedef struct {
-    float x_curr;
+    float curr_x;
     float y_bot;
     float y_top;
     int alive;

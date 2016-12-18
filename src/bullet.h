@@ -7,8 +7,8 @@
   #define BULLET_COUNT 4
 
   typedef struct {
-    float x_curr;
-    float y_curr;
+    float curr_x;
+    float curr_y;
     float v_x;
     float v_y;
     float angle;

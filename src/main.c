@@ -1,4 +1,5 @@
 #include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
@@ -62,8 +63,8 @@ int main(int argc, char* argv[]){
   player.colors = global_colors[(int)(rand()/(float)RAND_MAX * global_colors_number)];
   //////////////////////
 
-  // TODO trails update ////////////////////
-  trails[0].pos_x = player.x_curr;
+  // TODO trails init ////////////////////
+  trails[0].pos_x = player.curr_x;
   trails[0].pos_y = 0;
   trails[0].pos_z = -.4;
   trails[0].size = player.size * .3;
@@ -120,6 +121,18 @@ static void on_keyboard(unsigned char key, int x, int y) {
         }
         break;
       ////////////////////////////////////////////////////////
+
+      case 'e':
+      case 'E':
+        
+        if(player.mana >0 && player.hp < 100){
+          player.mana--;
+          if(player.hp + 30 > 100)
+            player.hp = 100;
+          else
+            player.hp += 30; 
+        }
+        break;
     }
 }
 
@@ -184,20 +197,22 @@ static void on_timer(int value){
       
       for(i=0;i<STAR_X_NUMBER;i++){
         for(j=0;j<STAR_Y_NUMBER;j++){
-          stars[i][j].x_curr -= stars[i][j].speed;
-          if(stars[i][j].x_curr<-2)
-            stars[i][j].x_curr=2;
+          stars[i][j].curr_x -= stars[i][j].speed;
+          if(stars[i][j].curr_x<-2)
+            stars[i][j].curr_x=2;
 
         }  
       }
-      mana_collision(i);
+      mana_collision();
+      bullets_player_collision();
+      bullets_walls_turrets_collision();
       for(i=0;i<WALL_COUNT;i++){
         wall_collision(i);
         enemy_collision(i);
         if(enemies[i].alive == DYING)
           enemies[i].dying_time += .007*speed_correction;
-        walls[i].x_curr -= ms;
-        enemies[i].x_curr -= ms;
+        walls[i].curr_x -= ms;
+        enemies[i].curr_x -= ms;
         check_score(i);
       }
 
@@ -214,9 +229,9 @@ static void on_timer(int value){
         for(j=0;j<BULLET_COUNT;j++){
           if(!bullets[i][j].alive)
             continue;
-          bullets[i][j].x_curr-=ms;
-          bullets[i][j].x_curr+=bullets[i][j].v_x*.01;
-          bullets[i][j].y_curr+=bullets[i][j].v_y*.01;
+          bullets[i][j].curr_x-=ms;
+          bullets[i][j].curr_x+=bullets[i][j].v_x*.025;
+          bullets[i][j].curr_y+=bullets[i][j].v_y*.025;
         }
       }
 
@@ -284,7 +299,7 @@ void on_display(){
   for(i=0;i<WALL_COUNT;i++){ // sigurno je manje kristala od zidova (ili jednako)
     draw_mana_crystal(i);
 
-    draw_wall(walls[i].x_curr,i);
+    draw_wall(walls[i].curr_x,i);
     draw_enemy(i);
     for(j=0;j<BULLET_COUNT;j++)
       draw_bullet(i,j);
@@ -297,7 +312,7 @@ void on_display(){
   }
 
   draw_mana_circle(player.mana);
-  draw_player(player.x_curr, player.y_curr, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
+  draw_player(player.curr_x, player.curr_y, player.colors.R, player.colors.G, player.colors.B); // FIXME jos konstanti
 
   for(i=0;i<trail_count;i++){
     draw_trail(trails[i].pos_x, trails[i].pos_y, // TODO crtaj trouglove, opacity, itd

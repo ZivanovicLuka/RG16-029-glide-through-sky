@@ -36,21 +36,21 @@ void summon_enemy(){
   else
     enemies[index].rotation = 1;
 
-  enemies[index].x_curr = walls[index].x_curr;
+  enemies[index].curr_x = walls[index].curr_x;
   if(enemies[index].rotation == 1)
-    enemies[index].y_curr = walls[index].y_top + .05; // fix
+    enemies[index].curr_y = walls[index].y_top + .05; // fix
   else
-    enemies[index].y_curr = walls[index].y_bot - .05; // fix
+    enemies[index].curr_y = walls[index].y_bot - .05; // fix
   enemies[index].alive = 1;
   enemies[index].dying_time = 0;
   enemies[index].pass = 0;
 }
 
 int in_range(int index){
-  float x1 = enemies[index].x_curr;
-  float y1 = enemies[index].y_curr;
-  float x2 = player.x_curr;
-  float y2 = player.y_curr;
+  float x1 = enemies[index].curr_x;
+  float y1 = enemies[index].curr_y;
+  float x2 = player.curr_x;
+  float y2 = player.curr_y;
   if(sqrt(pow(x2-x1,2)+pow(y2-y1,2))<range)
     return 1;
   return 0;
@@ -67,9 +67,9 @@ void fire(int index){
     float vector = sqrt(pow(vx ,2) + pow(vy,2));
     bullets[index][bullet_index].v_x = vx/vector;
     bullets[index][bullet_index].v_y = vy/vector;
-    bullets[index][bullet_index].x_curr = enemies[index].x_curr + 
+    bullets[index][bullet_index].curr_x = enemies[index].curr_x + 
                                           bullets[index][bullet_index].v_x*0.15;
-    bullets[index][bullet_index].y_curr = enemies[index].y_curr + 
+    bullets[index][bullet_index].curr_y = enemies[index].curr_y + 
                                           bullets[index][bullet_index].v_y*0.15 +
                                           enemies[index].rotation*(0.04 + 0.03);
     bullets[index][bullet_index].alive = 1;
@@ -94,8 +94,8 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
 
   float top_part_width = (top_width - gun_width) / 2;
 
-  float x = enemies[index].x_curr;
-  float y = enemies[index].y_curr;
+  float x = enemies[index].curr_x;
+  float y = enemies[index].curr_y;
   float colorR = walls[index].colorR * 0.9;
   float colorG = walls[index].colorG * 0.9;
   float colorB = walls[index].colorB * 0.9;
@@ -154,8 +154,8 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
 
       glTranslatef(0,0,top_part_width/2 + gun_width/2 + enemies[index].dying_time);
 
-      enemies[index].x_aim = enemies[index].x_curr;
-      enemies[index].y_aim = enemies[index].y_curr;
+      enemies[index].x_aim = enemies[index].curr_x;
+      enemies[index].y_aim = enemies[index].curr_y;
 
 //////
 
@@ -197,8 +197,8 @@ void aim(){
     if(!enemies[i].alive)
       continue;
 
-    dx = player.x_curr + .3 - enemies[i].x_aim; // gadja ispred
-    dy = player.y_curr - (enemies[i].y_aim + 0.04); // body height / 2
+    dx = player.curr_x + .3 - enemies[i].x_aim; // gadja ispred
+    dy = player.curr_y - (enemies[i].y_aim + 0.04); // body height / 2
 
     float angle_goal = atan2(dy,dx)*180/M_PI;
     float angle = enemies[i].angle;

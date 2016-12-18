@@ -53,8 +53,8 @@ void stars_init(){
       float dx = rand() / (float)RAND_MAX *1.6 - 0.8;
       float dy = rand() / (float)RAND_MAX *1.6 - 0.8;
 
-      stars[i][j].x_curr = 4.0/STAR_X_NUMBER * (i + dx) - 2;
-      stars[i][j].y_curr = 2.4/STAR_Y_NUMBER * (j + dy) - 1.2;
+      stars[i][j].curr_x = 4.0/STAR_X_NUMBER * (i + dx) - 2;
+      stars[i][j].curr_y = 2.4/STAR_Y_NUMBER * (j + dy) - 1.2;
       stars[i][j].speed =  rand() / (float)RAND_MAX * .0007 + 0.0002;
     }
   }
@@ -89,9 +89,9 @@ void draw_world(){
 
   for(i=0;i<STAR_X_NUMBER;i++){
     for(j=0;j<STAR_Y_NUMBER;j++){
-      glTranslatef(stars[i][j].x_curr,stars[i][j].y_curr,-.8);
+      glTranslatef(stars[i][j].curr_x,stars[i][j].curr_y,-.8);
       glutSolidCube(.01);
-      glTranslatef(-stars[i][j].x_curr,-stars[i][j].y_curr,.8);
+      glTranslatef(-stars[i][j].curr_x,-stars[i][j].curr_y,.8);
     }
   }
 
@@ -105,7 +105,7 @@ void draw_world(){
 
 void check_score(int index){
   if(!walls[index].pass){
-    if(walls[index].x_curr + wall_width/2 < player.x_curr - player.size/2){
+    if(walls[index].curr_x + wall_width/2 < player.curr_x - player.size/2){
       walls[index].pass = 1;
       world.score++;
       sprintf(gui.score_text, "Score: %d", world.score); // FIXME SPORO!!!

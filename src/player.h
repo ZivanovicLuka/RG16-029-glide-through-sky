@@ -21,7 +21,7 @@
 
   #define TRAIL_TIMER_ID 2
   #define TRAIL_TIMER_INTERVAL 40
-  #define TRAIL_MAX 12
+  #define TRAIL_MAX 15
 
   typedef struct {
     float R;
@@ -33,10 +33,11 @@
   int global_colors_number;
 
   typedef struct {
-    float x_curr;
-    float y_curr;
+    float curr_x;
+    float curr_y;
     float v_y; // velocity
     float size;
+    int hp;
     Color3f colors;
     int mana;
     int invulnerable;

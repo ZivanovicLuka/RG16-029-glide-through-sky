@@ -15,13 +15,14 @@
 
 
 Player player = {
-  -.5, //player.x_curr
-  0,   //player.y_curr
+  -.5, //player.curr_x
+  0,   //player.curr_y
   0,   //player.v_y
   .1,  //player.size
-  {1,   //player.colorR
+  50, //player.hp
+  {1,  //player.colorR
   0,   //player.colorG
-  1},   //player.colorB
+  1},  //player.colorB
   0,   //player.mana
   0,   //player.invulnerable
   0    //player.dashing
@@ -55,22 +56,22 @@ void wall_collision(int index){
 
   float wall_bot = walls[index].y_bot;
   float wall_top = walls[index].y_top;
-  float wall_left = walls[index].x_curr - wall_width/2;
-  float wall_right = walls[index].x_curr + wall_width/2;
+  float wall_left = walls[index].curr_x - wall_width/2;
+  float wall_right = walls[index].curr_x + wall_width/2;
 
-  float PLAYER_bot = player.y_curr - player.size/2;
-  float PLAYER_top = player.y_curr + player.size/2;
-  float PLAYER_left = player.x_curr - player.size/2;
-  float PLAYER_right = player.x_curr + player.size/2;
+  float player_bot = player.curr_y - player.size/2;
+  float player_top = player.curr_y + player.size/2;
+  float player_left = player.curr_x - player.size/2;
+  float player_right = player.curr_x + player.size/2;
 
-  if((PLAYER_top >= wall_bot && PLAYER_left <= wall_right && PLAYER_right >= wall_left) ||
-  (PLAYER_bot <= wall_top && PLAYER_left <= wall_right && PLAYER_right >= wall_left)){
-    if(!player.invulnerable){
+  if((player_top >= wall_bot && player_left <= wall_right && player_right >= wall_left) ||
+  (player_bot <= wall_top && player_left <= wall_right && player_right >= wall_left)){
+    if(!player.dashing){
       printf("Score: %d\n", world.score);
      exit(0);
     } else {
       walls[index].hollow = 1;
-      walls[index].hole_y = player.y_curr;
+      walls[index].hole_y = player.curr_y;
     }
    return;
   }
@@ -87,13 +88,13 @@ void mana_collision(){
   float mana_left = crystal.curr_x - mana_height/2;
   float mana_right = crystal.curr_x + mana_height/2;
 
-  float PLAYER_bot = player.y_curr - player.size/2;
-  float PLAYER_top = player.y_curr + player.size/2;
-  float PLAYER_left = player.x_curr - player.size/2;
-  float PLAYER_right = player.x_curr + player.size/2;
+  float player_bot = player.curr_y - player.size/2;
+  float player_top = player.curr_y + player.size/2;
+  float player_left = player.curr_x - player.size/2;
+  float player_right = player.curr_x + player.size/2;
 
-  if(PLAYER_top >= mana_bot && PLAYER_left <= mana_right && PLAYER_right >= mana_left &&
-  PLAYER_bot <= mana_top){
+  if(player_top >= mana_bot && player_left <= mana_right && player_right >= mana_left &&
+  player_bot <= mana_top){
      player.mana++;
      if(player.dashing)
         player.mana++;
@@ -110,39 +111,39 @@ void enemy_collision(int index){
   float enemy_height = 0.14; // TODO iz enemy.c
   float enemy_width = 0.16;
 
-  float enemy_bot = enemies[index].y_curr - enemy_height/2;
-  float enemy_top = enemies[index].y_curr + enemy_height/2;
-  float enemy_left = enemies[index].x_curr - enemy_height/2;
-  float enemy_right = enemies[index].x_curr + enemy_height/2;
+  float enemy_bot = enemies[index].curr_y - enemy_height/2;
+  float enemy_top = enemies[index].curr_y + enemy_height/2;
+  float enemy_left = enemies[index].curr_x - enemy_height/2;
+  float enemy_right = enemies[index].curr_x + enemy_height/2;
 
-  float PLAYER_bot = player.y_curr - player.size/2;
-  float PLAYER_top = player.y_curr + player.size/2;
-  float PLAYER_left = player.x_curr - player.size/2;
-  float PLAYER_right = player.x_curr + player.size/2;
+  float player_bot = player.curr_y - player.size/2;
+  float player_top = player.curr_y + player.size/2;
+  float player_left = player.curr_x - player.size/2;
+  float player_right = player.curr_x + player.size/2;
 
-  if(PLAYER_top >= enemy_bot && PLAYER_left <= enemy_right && PLAYER_right >= enemy_left &&
-  PLAYER_bot <= enemy_top){
+  if(player_top >= enemy_bot && player_left <= enemy_right && player_right >= enemy_left &&
+  player_bot <= enemy_top){
      if(player.dashing){
         enemies[index].alive = DYING;
         enemies[index].dying_time = 0;
-        player.mana += (int)rand()/(float)RAND_MAX * 1.3 + .8;
+        player.mana += (int)rand()/(float)RAND_MAX * 2 + 1;
      }
       return;
   }
 }
 
 void teleport(){
-  if(player.y_curr < -1){
-    player.y_curr = 1;
+  if(player.curr_y < -1){
+    player.curr_y = 1;
   }
 
-  if(player.y_curr > 1){
-    player.y_curr = -1;
+  if(player.curr_y > 1){
+    player.curr_y = -1;
   }
 }
 
 void player_move(){
-  player.y_curr += player.v_y * speed_correction;
+  player.curr_y += player.v_y * speed_correction;
   if(player.v_y > -.029){ // FIXME konstanta
     player.v_y -= world.gravity * speed_correction;
   }
@@ -175,7 +176,7 @@ void dash(){
 
 void summon_trail(){
   int i;
-  int n = TRAIL_MAX;
+  int n = (TRAIL_MAX-2)*(float)player.hp/100 + 2;
 
   for(i=n-1; i>=1; i--){
     trails[i].pos_y = trails[i-1].pos_y;
@@ -184,11 +185,13 @@ void summon_trail(){
 
   float dy = rand()/(float)RAND_MAX * player.size - player.size/2;
 
-  trails[0].pos_y = player.y_curr + dy;
+  trails[0].pos_y = player.curr_y + dy;
   trails[0].size = (rand()/(float)RAND_MAX * .3 + .4)* player.size;
 
-  if(trail_count < TRAIL_MAX)
+  if(trail_count < n)
     trail_count++;
+  else
+    trail_count = n;
 }
 
 void draw_trail(float x, float y, float colorR, float colorG, float colorB, float size){

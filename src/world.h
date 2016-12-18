@@ -41,8 +41,8 @@
   } World;
 
   typedef struct {
-    float x_curr;
-    float y_curr;
+    float curr_x;
+    float curr_y;
     float speed;
   } Star;
 
