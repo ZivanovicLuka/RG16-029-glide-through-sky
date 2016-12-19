@@ -2,14 +2,16 @@
   #define PLAYER_H
 
   void player_init();
-  void draw_player(float x, float y, float R, float G, float B);
-  void draw_trail(float x, float y, float R, float G, float B, float size);
+  void draw_player();
+  void draw_trail_particle(int index);
+  void draw_trail();
   void wall_collision(int index);
   void mana_collision();
   void enemy_collision(int index);
   void mana_enemies_collision();
   void dash();
   void dash_start();
+  void dashing(float ms);
   void teleport();
   void heal();
   void player_move();
@@ -20,11 +22,6 @@
   #define PLAYER_REFRESH_TIMER_ID 0
   #define PLAYER_REFRESH_TIMER_INTERVAL 10
 
-  #define DASH_TIMER_ID 3
-  #define DASH_TIMER_INTERVAL 350
-
-  #define TRAIL_TIMER_ID 2
-  #define TRAIL_TIMER_INTERVAL 40
   #define TRAIL_MAX 15
 
   typedef struct {
@@ -50,8 +47,8 @@
   } Player;
 
   typedef struct {
-    float pos_x;
-    float pos_y;
+    float curr_x;
+    float curr_y;
     float pos_z;
     float colors;
     float size;

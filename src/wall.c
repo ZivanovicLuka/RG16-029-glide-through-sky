@@ -10,7 +10,7 @@
 Wall walls[WALL_COUNT];
 
 const float wall_width = .3;
-float wall_speed = 0.013;
+float wall_speed = .013;
 float wall_gap = 1.;
 float wall_gap_min = .7;
 float wall_gap_dec = .03;
@@ -41,9 +41,9 @@ void summon_wall(){
   walls[index].curr_x = 1 + wall_width/2 + 1; // od kad je 3d ide i +1
   walls[index].y_bot = r;
   walls[index].y_top = r - wall_gap;
-  walls[index].colorR = rand() / (float)RAND_MAX * 0.5 + 0.5;
-  walls[index].colorG = rand() / (float)RAND_MAX * 0.5 + 0.5;
-  walls[index].colorB = rand() / (float)RAND_MAX * 0.5 + 0.5;
+  walls[index].colorR = rand() / (float)RAND_MAX * .5 + .5;
+  walls[index].colorG = rand() / (float)RAND_MAX * .5 + .5;
+  walls[index].colorB = rand() / (float)RAND_MAX * .5 + .5;
   walls[index].alive = 1;
   walls[index].pass = 0;
 }
@@ -55,10 +55,11 @@ void walls_move(float ms){
   }
 }
 
-void draw_wall(float x, int index){
+void draw_wall(int index){
   if(walls[index].alive){
 
     float distance = 0;
+    float x = walls[index].curr_x;
 
     float hole_size = player.size * 1.3;
     float hole_top = walls[index].hole_y + hole_size/2;
@@ -139,5 +140,12 @@ void draw_wall(float x, int index){
       }
     glPopMatrix();
     glutPostRedisplay();
+  }
+}
+
+void draw_walls(){
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+        draw_wall(i);
   }
 }

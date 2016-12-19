@@ -17,6 +17,8 @@
 
 #include "world.h"
 
+#include "misc_functions.h"
+
 
 int window_width = 500;
 int window_height = 500;
@@ -34,22 +36,10 @@ World world = {
 
 float distance = 0;
 
-GUI gui = {
-  -1,    // z, Global z-index of gui
-  0,     // plate_width 
-  0,     // plate_height
-  0,     // hp_x
-  0,     // hp_y
-  0,     // score_x
-  0,     // score_y
-  0,     // score_text[15]
-};
-
-
-Star stars[100][10]; // x_number * y_number
+Star stars[STAR_X_NUMBER][STAR_Y_NUMBER];
 
 void score_init(){
-  strcpy(gui.score_text,"Score: 0");
+  strcpy(score_text,"Score: 0");
   return;
 }
 
@@ -57,12 +47,12 @@ void stars_init(){
   int i,j;
   for(i=0;i<STAR_X_NUMBER;i++){
     for(j=0;j<STAR_Y_NUMBER;j++){
-      float dx = rand() / (float)RAND_MAX *1.6 - 0.8;
-      float dy = rand() / (float)RAND_MAX *1.6 - 0.8;
+      float dx = rand() / (float)RAND_MAX *1.6 - .8;
+      float dy = rand() / (float)RAND_MAX *1.6 - .8;
 
       stars[i][j].curr_x = 4.0/STAR_X_NUMBER * (i + dx) - 2;
       stars[i][j].curr_y = 2.4/STAR_Y_NUMBER * (j + dy) - 1.2;
-      stars[i][j].speed =  rand() / (float)RAND_MAX * .0007 + 0.0002;
+      stars[i][j].speed =  rand() / (float)RAND_MAX * .0007 + .0002;
     }
   }
 }
@@ -79,26 +69,26 @@ void stars_move(){
 }
 
 void draw_world(){
-  GLfloat diffuse_coeffs[] = { 0, 0, 0.1, 1 };
+  GLfloat diffuse_coeffs[] = { 0, 0, .1, 1 };
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
   glMaterialfv(GL_FRONT, GL_SPECULAR, diffuse_coeffs);
 
   glPushMatrix();
       glTranslatef(0,3.5,0);
-      glScalef(1, 1, 0.3);
+      glScalef(1, 1, .3);
       glutSolidCube(5);
   glPopMatrix();
 
   glPushMatrix();
       glTranslatef(0,-3.5,0);
-      glScalef(1, 1, 0.3);
+      glScalef(1, 1, .3);
       glutSolidCube(5);
   glPopMatrix();
 
   int i,j;
-  diffuse_coeffs[0] = 0.01;
-  diffuse_coeffs[1] = 0.01;
-  diffuse_coeffs[2] = 0.01;
+  diffuse_coeffs[0] = .01;
+  diffuse_coeffs[1] = .01;
+  diffuse_coeffs[2] = .01;
   glMaterialfv(GL_FRONT, GL_SPECULAR, diffuse_coeffs);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
@@ -113,9 +103,9 @@ void draw_world(){
     }
   }
 
-  ambient_coeffs[0] = 0.3;
-  ambient_coeffs[1] = 0.3;
-  ambient_coeffs[2] = 0.3;
+  ambient_coeffs[0] = .3;
+  ambient_coeffs[1] = .3;
+  ambient_coeffs[2] = .3;
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
 
   glutPostRedisplay();
@@ -128,15 +118,22 @@ void check_score(){
       if(walls[i].curr_x + wall_width/2 < player.curr_x - player.size/2){
         walls[i].pass = 1;
         world.score++;
-        sprintf(gui.score_text, "Score: %d", world.score);
+        sprintf(score_text, "Score: %d", world.score);
       }
     }
   }
 }
 
+void draw_score(){
+  float text_x = -.93;
+  float text_y = .89;
+  float text_z = .3;
+  RenderString(text_x, text_y, GLUT_BITMAP_HELVETICA_18, score_text, .6, .6, .6);
+}
+
 void restart(){
   printf("Score: %d\n", world.score);
-  
+
   player_init();
   bullets_init();
   stars_init();
@@ -145,5 +142,7 @@ void restart(){
   enemies_init();
   mana_crystal_init();
   world.score = 0;
+  wall_speed = .013;
+  
   world.animation_ongoing = 0;
 }

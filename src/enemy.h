@@ -4,23 +4,22 @@
   #define BULLETS_COUNT 4
   #define DYING 2
 
-  void draw_enemy(int index);//float y, float x, float colorR, float colorG, float colorB, int alive, float angle);
+  void draw_enemy(int index);
+  void draw_enemies();
   void summon_enemy();
-  void enemies_move(float ms);
+  void enemies_move(float ms, float speed_correction);
   void enemies_init();
   void enemies_aim();
-  void fire(int index);
+  void enemy_fire(int index);
+  void enemies_fire();
   int in_range(int index);
 
   typedef struct {
     float curr_x;
     float curr_y;
     int alive;
-    int pass;
     float angle;
     float dying_time;
-    float x_aim;
-    float y_aim;
     int rotation;
     int bullet_index;
   } Enemy;

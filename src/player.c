@@ -42,22 +42,28 @@ void player_init(){
   };
 
   trail_count = -5;
-  trails[0].pos_x = player.curr_x;
-  trails[0].pos_y = 0;
+  trails[0].curr_x = player.curr_x;
+  trails[0].curr_y = 0;
   trails[0].pos_z = -.4;
   trails[0].size = player.size * .3;
   trails[0].colors = trail_color_alpha;
 
   int i;
   for(i=1; i<TRAIL_MAX; i++){
-    trails[i].pos_x = trails[i-1].pos_x - trail_x_move;
-    trails[i].pos_y = 0;
+    trails[i].curr_x = trails[i-1].curr_x - trail_x_move;
+    trails[i].curr_y = 0;
     trails[i].pos_z = trails[i-1].pos_z + .001;
     trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
   }
 }
 
-void draw_player(float x, float y, float colorR, float colorG, float colorB){
+void draw_player(){
+
+  float x = player.curr_x;
+  float y = player.curr_y;
+  float colorR = player.colors.R;
+  float colorG = player.colors.G;
+  float colorB = player.colors.B;
 
   GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
@@ -107,7 +113,7 @@ void mana_collision(){
   if(!crystal.alive)
     return;
 
-  float mana_height = 0.085; // 0.06 * sqrt(2), posto je dijagonala
+  float mana_height = .085; // .06 * sqrt(2), posto je dijagonala
 
   float mana_bot = crystal.curr_y - mana_height/2;
   float mana_top = crystal.curr_y + mana_height/2;
@@ -134,8 +140,8 @@ void enemy_collision(int index){
   if(enemies[index].alive != 1)
     return;
 
-  float enemy_height = 0.14; // TODO iz enemy.c
-  float enemy_width = 0.16;
+  float enemy_height = .14; // TODO iz enemy.c
+  float enemy_width = .16;
 
   float enemy_bot = enemies[index].curr_y - enemy_height/2;
   float enemy_top = enemies[index].curr_y + enemy_height/2;
@@ -154,7 +160,7 @@ void enemy_collision(int index){
      if(player.dashing){
         player.mana += (int)rand()/(float)RAND_MAX * 2 + 1;
      } else {
-       player.hp -= 50;
+       player.hp -= 30;
      }
   }
 }
@@ -211,11 +217,23 @@ void dash(){
   if(player.dashing){
     player.invulnerable = 1;
     player.v_y = 0;
-    wall_speed = 0.03;
+    wall_speed = .03;
   }
   else{
     player.invulnerable = 0;
-    wall_speed = 0.013;
+    wall_speed = .013;
+  }
+}
+
+void dashing(float ms){
+  dash();
+  if(player.dashing)
+    player.dash_distance += ms;
+  if(player.dash_distance >= .95){
+    if(player.dashing){
+      player.dashing = 0;
+    }
+    player.dash_distance = 0;
   }
 }
 
@@ -224,13 +242,13 @@ void summon_trail(){
   int n = (TRAIL_MAX-2)*(float)player.hp/100 + 2;
 
   for(i=n-1; i>=1; i--){
-    trails[i].pos_y = trails[i-1].pos_y;
+    trails[i].curr_y = trails[i-1].curr_y;
     trails[i].size = trails[i-1].size;
   }
 
   float dy = rand()/(float)RAND_MAX * player.size - player.size/2;
 
-  trails[0].pos_y = player.curr_y + dy;
+  trails[0].curr_y = player.curr_y + dy;
   trails[0].size = (rand()/(float)RAND_MAX * .3 + .4)* player.size;
 
   if(trail_count < n)
@@ -239,7 +257,14 @@ void summon_trail(){
     trail_count = n;
 }
 
-void draw_trail(float x, float y, float colorR, float colorG, float colorB, float size){
+void draw_trail_particle(int index){
+
+  float x = trails[index].curr_x;
+  float y = trails[index].curr_y;
+  float colorR = player.colors.R * trails[index].colors;
+  float colorG = player.colors.G * trails[index].colors;
+  float colorB = player.colors.B * trails[index].colors;
+  float size = trails[index].size;
 
   rand()/(float)RAND_MAX * player.size - player.size/2;
   GLfloat diffuse_coeffs[] = { colorR, colorG, colorB, 1 };
@@ -251,4 +276,11 @@ void draw_trail(float x, float y, float colorR, float colorG, float colorB, floa
       glutSolidCube(1);
   glPopMatrix();
   glutPostRedisplay();
+}
+
+void draw_trail(){
+  int i;
+  for(i=0;i<trail_count;i++){
+    draw_trail_particle(i);
+  }
 }

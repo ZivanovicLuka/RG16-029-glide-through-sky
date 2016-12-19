@@ -1,7 +1,8 @@
 #ifndef WALL_H
   #define WALL_H
 
-  void draw_wall(float x, int index);
+  void draw_wall(int index);
+  void draw_walls();
   void summon_wall();
   void wall_init();
   void walls_move(float ms);

@@ -25,16 +25,19 @@ void mana_crystal_init(){
   mana_init = 0;
   walls_passed_counter = 0;
   crystal.alive = 0;
+  crystal.rotation_time = 0;
 }
 
 void summon_mana(int index){
-  crystal.alive = 1;
-  crystal.curr_x = 1 + .55; // FIXME .55 treba da predstavlja polovinu razmaka izmedju 2 zida
+  if((walls_passed_counter = (walls_passed_counter+1)%4) == 0){
+    crystal.alive = 1;
+    crystal.curr_x = 1 + .55; // FIXME .55 treba da predstavlja polovinu razmaka izmedju 2 zida
+  }
 }
 
 void draw_mana_crystal(){
   if(crystal.alive){
-    GLfloat diffuse_coeffs[] = { 0.0, .2, 1, .1 };
+    GLfloat diffuse_coeffs[] = { .0, .2, 1, .1 };
     GLfloat emission_coeffs[] = { .03, .03, .43, 1 };
 
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
@@ -63,8 +66,6 @@ void draw_mana_crystal(){
         glRotatef(mana_crystal_rotation, 0, 1, 0);
         glScalef(1, 1.5, 1);
         glRotatef(45,1,0,1);
-
-        // glutWireCube(.0601);
     glPopMatrix();
 
     emission_coeffs[0] = 0;
@@ -73,12 +74,11 @@ void draw_mana_crystal(){
     emission_coeffs[3] = 1;
 
     glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
-
-
   }
 }
 
 void mana_crystal_move(float ms){
+  crystal.rotation_time += ms; 
   mana_crystal_rotation += speed_correction * 1.8;
   if (world.animation_ongoing) {
     crystal.curr_x -= ms;
@@ -110,7 +110,7 @@ void draw_mana_circle(int mana){
   // glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
 
   float rotate_angle = 360 / mana;
-  float t = -world.time*350;
+  float t = -crystal.rotation_time*350;
   float r = .13; 
 
   float x,y;
@@ -130,7 +130,7 @@ void draw_mana_circle(int mana){
         
         glTranslatef(x_center + x, y_center + y, z);
         glRotatef(t + 90,0,0,1);
-        glScalef(small_width*0.8 ,height,.01);
+        glScalef(small_width*.8 ,height,.01);
         glutSolidCube(1);
     glPopMatrix();
     

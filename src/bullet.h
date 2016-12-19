@@ -3,6 +3,7 @@
 
   void bullets_init();
   void draw_bullet();
+  void draw_bullets();
   void bullets_init();
   void bullets_move(float ms);
   void bullets_player_collision();

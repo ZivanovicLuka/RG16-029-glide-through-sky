@@ -13,6 +13,7 @@
     float curr_x;
     int alive;
     int pass; // ne znam sta je sad
+    float rotation_time;
   } Crystal;
 
   float mana_crystal_rotation;

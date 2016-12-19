@@ -9,29 +9,16 @@
   void score_init();
   void stars_init();
   void stars_move();
+  void draw_score();
   void restart();
 
   int window_width;
   int window_height;
   float speed_correction;
 
-  typedef struct {
-    // Global z-index of gui
-    float z;
-    // Plate
-    float plate_width;
-    float plate_height;
-    // HP
-    float hp_x;
-    float hp_y;
-    // Mana
-    float mana_x;
-    float mana_y;
-    // Score
-    float score_x;
-    float score_y;
-    char score_text[15];
-  } GUI;
+
+  char score_text[15];
+
 
   typedef struct {
     float gravity;
