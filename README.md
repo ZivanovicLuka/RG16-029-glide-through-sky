@@ -27,16 +27,28 @@
   <tr>
     <td>W</td><td>Dash</td>
   </tr>
-</table>
-
-<table>
   <tr>
-    <th colspan="2">Player 2</th>
-  </tr>
-  <tr>
-    <td>Mouse</td><td>Aim</td>
+    <td>E</td><td>Heal</td>
   </tr>
 </table>
-
-
 ***
+
+### :computer: Gameplay
+* __Mana is represented by circle around player__  
+__Health is represented by trail behind player__
+  
+* You start with 70% hp  
+
+* Heal gives you 30% hp, and taking 1 mana  
+Dash cost is 1 mana
+
+* Taking bullet removes 15% of your hp  
+Taking bullet while dashing removes 7% of your hp  
+Hitting enemy removes 50% of your hp  
+Hitting wall removes 100% of your hp
+
+* Hitting mana crystal gives you 1 mana  
+Hitting mana crystal whiel dashing gives you 1 mana (not losing for dash)  
+Hitting enemy with dash gives you 1-2 mana
+
+
