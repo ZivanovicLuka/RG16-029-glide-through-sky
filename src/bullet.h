@@ -3,6 +3,11 @@
 
   void bullets_init();
   void draw_bullet();
+  void bullets_init();
+  void bullets_move(float ms);
+  void bullets_player_collision();
+  void bullets_walls_turrets_collision();
+  void bullets_world_collision();
 
   #define BULLET_COUNT 4
 

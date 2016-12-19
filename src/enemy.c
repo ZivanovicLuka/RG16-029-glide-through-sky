@@ -79,6 +79,14 @@ void fire(int index){
   }
 }
 
+void enemies_move(float ms){
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+    enemies[i].curr_x -= ms;
+  }
+}
+
+
 void draw_enemy(int index){//float x, float y, float colorR, float colorG, float colorB, int alive, float angle){
   if(!enemies[index].alive)
     return;
@@ -189,7 +197,7 @@ void draw_enemy(int index){//float x, float y, float colorR, float colorG, float
   glutPostRedisplay();
 }
 
-void aim(){
+void enemies_aim(){
   float dx,dy;
 
   int i;

@@ -50,36 +50,13 @@ int main(int argc, char* argv[]){
 
   srand(time(NULL));
 
+  player_init();
   bullets_init();
   stars_init();
   score_init();
   wall_init();
-
-  // TODO player init //
-
-  // int global_colors_number = 8;
-  // Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{0,0,1},{0,1,1}};
-
-  player.colors = global_colors[(int)(rand()/(float)RAND_MAX * global_colors_number)];
-  //////////////////////
-
-  // TODO trails init ////////////////////
-  trails[0].pos_x = player.curr_x;
-  trails[0].pos_y = 0;
-  trails[0].pos_z = -.4;
-  trails[0].size = player.size * .3;
-  trails[0].colors = trail_color_alpha;
-
-  int i;
-  for(i=1; i<TRAIL_MAX; i++){
-    trails[i].pos_x = trails[i-1].pos_x - trail_x_move;
-    // printf("%f\n", trails[i].pos_x);
-    trails[i].pos_y = 0;
-    trails[i].pos_z = trails[i-1].pos_z + .001;
-    trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
-  }
-  //////////////////////////////////////////
-
+  enemies_init();
+  mana_crystal_init();
 
   glutMainLoop();
 
@@ -108,29 +85,26 @@ static void on_keyboard(unsigned char key, int x, int y) {
 
       case 'q':
       case 'Q':
-        if(!player.dashing)
-          player.v_y = world.jump;
-        break;
-
-      // TODO vidi da ubacis i glutTimerFunc u dash_start
-      case 'w':
-      case 'W':
-        if(!player.dashing && player.mana > 0){
-          glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
-          dash_start();
+        if (world.animation_ongoing) {
+          if(!player.dashing)
+            player.v_y = world.jump;
         }
         break;
-      ////////////////////////////////////////////////////////
+
+      case 'w':
+      case 'W':
+        if (world.animation_ongoing) {
+          if(!player.dashing && player.mana > 0){
+            glutTimerFunc(DASH_TIMER_INTERVAL, on_timer, DASH_TIMER_ID);
+            dash_start();
+          }
+        }
+        break;
 
       case 'e':
       case 'E':
-        
-        if(player.mana >0 && player.hp < 100){
-          player.mana--;
-          if(player.hp + 30 > 100)
-            player.hp = 100;
-          else
-            player.hp += 30; 
+        if (world.animation_ongoing) {
+          heal();
         }
         break;
     }
@@ -151,89 +125,76 @@ static void on_reshape(int width, int height){
 
 static void on_timer(int value){
     int i,j;
-    // TODO mozda stavi preko distance, nema potrebe za tajmerom
-    if(value == TRAIL_TIMER_ID){
-      summon_trail();
-      if (world.animation_ongoing) {
-        glutTimerFunc(TRAIL_TIMER_INTERVAL, on_timer, TRAIL_TIMER_ID);
-      }
-    }
-    //////////////////////////////////////////////////
-
 
     if(value == PLAYER_REFRESH_TIMER_ID){
 
-      // Correction for different performances
+      /* Correction for different performances */
       updateDeltaTime();
-
       speed_correction = dt / (float)PLAYER_REFRESH_TIMER_INTERVAL;
       float ms = wall_speed * speed_correction;
-      
-      world.time += ms;
-      if(mana_init<3){
-        mana_init_time+=ms;
-        if(mana_init_time > 30*ms){
-          mana_init++;
-          player.mana++;
-          mana_init_time-= 30*ms;
-        }
+
+      if(!alive()){
+        restart();
       }
-      if(world.distance>=1.5){
-        
-        world.distance-=1.3;
+
+      // mana init
+      mana_circle_init_animation(ms);
+
+      // SREDI OVO
+      if(world.wall_summon_distance>=1.5){
+        world.wall_summon_distance-=1.3;
         summon_wall();
         summon_enemy(); 
         for(i=0;i<WALL_COUNT;i++){
          fire(i);
-         
         }
         if((walls_passed_counter = (walls_passed_counter+1)%4) == 0)
           summon_mana();
       }
+      world.wall_summon_distance += ms;
 
+      if(world.trail_summon_distance>=.075){
+        world.trail_summon_distance-=.075;
+          summon_trail();
+      }
+      world.trail_summon_distance += ms;
+
+      if(player.dashing)
+        player.dash_distance += ms;
+      if(player.dash_distance >= .95){
+        if(player.dashing){
+          player.dashing = 0;
+        }
+        dash();
+        player.dash_distance = 0;
+      }
+      ////////////
+      
+      world.time += ms; // predjein put
 
       player_move();
-      world.distance += ms;
-      
-      for(i=0;i<STAR_X_NUMBER;i++){
-        for(j=0;j<STAR_Y_NUMBER;j++){
-          stars[i][j].curr_x -= stars[i][j].speed;
-          if(stars[i][j].curr_x<-2)
-            stars[i][j].curr_x=2;
-
-        }  
-      }
-      mana_collision();
+      stars_move();
+      walls_move(ms);
+      enemies_move(ms);
+      mana_crystal_move(ms);
+      bullets_move(ms);
+ 
+      mana_enemies_collision();
       bullets_player_collision();
       bullets_walls_turrets_collision();
+      bullets_world_collision();
+      mana_collision();
+      
+      enemies_aim();
+
+      check_score();
+
+      // FIXME
       for(i=0;i<WALL_COUNT;i++){
-        wall_collision(i);
-        enemy_collision(i);
         if(enemies[i].alive == DYING)
           enemies[i].dying_time += .007*speed_correction;
-        walls[i].curr_x -= ms;
-        enemies[i].curr_x -= ms;
-        check_score(i);
       }
-
-
-      mana_crystal_rotation += speed_correction * 1.8;
-      if (world.animation_ongoing) {
-        crystal.curr_x -= ms;
-      }
-      crystal.curr_y = sin(mana_crystal_rotation*.02)*.08;
-
-      aim();
-
-      for(i=0;i<WALL_COUNT;i++){
-        for(j=0;j<BULLET_COUNT;j++){
-          if(!bullets[i][j].alive)
-            continue;
-          bullets[i][j].curr_x-=ms;
-          bullets[i][j].curr_x+=bullets[i][j].v_x*.025;
-          bullets[i][j].curr_y+=bullets[i][j].v_y*.025;
-        }
-      }
+      /////
 
       glutPostRedisplay();
 
@@ -241,16 +202,7 @@ static void on_timer(int value){
           glutTimerFunc(PLAYER_REFRESH_TIMER_INTERVAL, on_timer, PLAYER_REFRESH_TIMER_ID);
       }
     }
-
-    if(value == DASH_TIMER_ID){
-      if(player.dashing){
-        player.dashing = 0;
-      }
-      dash();
-    }
 }
-
-// float global_transform_matrix[16];
 
 void on_display(){
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -288,16 +240,14 @@ void on_display(){
   glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
   glMatrixMode(GL_MODELVIEW);
-
-  // glGetFloatv(GL_MODELVIEW_MATRIX, global_transform_matrix);
-
   glLoadIdentity();
 
   draw_world();
 
+  draw_mana_crystal();
+
   int i,j;
-  for(i=0;i<WALL_COUNT;i++){ // sigurno je manje kristala od zidova (ili jednako)
-    draw_mana_crystal(i);
+  for(i=0;i<WALL_COUNT;i++){
 
     draw_wall(walls[i].curr_x,i);
     draw_enemy(i);
@@ -351,9 +301,7 @@ static int timeSum = 0;
 
 void updateDeltaTime() {
     newTime = glutGet(GLUT_ELAPSED_TIME);
-    // printf("TIME: %f\n",newTime);
     dt = newTime - oldTime;
-    // printf("dt: %f\n");
     oldTime = newTime;
     timeSum += dt;
     if (dt>DT_MAX)

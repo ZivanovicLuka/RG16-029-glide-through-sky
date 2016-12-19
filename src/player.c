@@ -14,19 +14,7 @@
 #include "enemy_externs.h"
 
 
-Player player = {
-  -.5, //player.curr_x
-  0,   //player.curr_y
-  0,   //player.v_y
-  .1,  //player.size
-  50, //player.hp
-  {1,  //player.colorR
-  0,   //player.colorG
-  1},  //player.colorB
-  0,   //player.mana
-  0,   //player.invulnerable
-  0    //player.dashing
-};
+Player player;
 
 Color3f global_colors[] = {{1,0,1},{0,1,0},{1,1,0},{1,.2,.2},{.5,0,1},{0,1,.6},{.3,.2,1},{0,1,1}};
 int global_colors_number = 8;
@@ -34,7 +22,40 @@ int global_colors_number = 8;
 Trail trails[TRAIL_MAX];
 float trail_x_move = .04;
 float trail_color_alpha = 1;
-int trail_count = -5;
+int trail_count;
+
+int max_hp = 100;
+int heal_hp = 30;
+
+void player_init(){
+  player = (Player){
+    -.5, //player.curr_x
+    0,   //player.curr_y
+    0,   //player.v_y
+    .1,  //player.size
+    70,  //player.hp
+    global_colors[(int)(rand()/(float)RAND_MAX * global_colors_number)], // player.colors
+    0,   //player.mana
+    0,   //player.invulnerable
+    0,    //player.dashing
+    0    //player.dash_distance
+  };
+
+  trail_count = -5;
+  trails[0].pos_x = player.curr_x;
+  trails[0].pos_y = 0;
+  trails[0].pos_z = -.4;
+  trails[0].size = player.size * .3;
+  trails[0].colors = trail_color_alpha;
+
+  int i;
+  for(i=1; i<TRAIL_MAX; i++){
+    trails[i].pos_x = trails[i-1].pos_x - trail_x_move;
+    trails[i].pos_y = 0;
+    trails[i].pos_z = trails[i-1].pos_z + .001;
+    trails[i].colors = trails[i-1].colors - trail_color_alpha/TRAIL_MAX;
+  }
+}
 
 void draw_player(float x, float y, float colorR, float colorG, float colorB){
 
@@ -67,14 +88,19 @@ void wall_collision(int index){
   if((player_top >= wall_bot && player_left <= wall_right && player_right >= wall_left) ||
   (player_bot <= wall_top && player_left <= wall_right && player_right >= wall_left)){
     if(!player.dashing){
-      printf("Score: %d\n", world.score);
-     exit(0);
+      restart();
     } else {
       walls[index].hollow = 1;
       walls[index].hole_y = player.curr_y;
     }
    return;
   }
+}
+
+int alive(){
+  if(player.hp <= 0)
+    return 0;
+  return 1;
 }
 
 void mana_collision(){
@@ -98,7 +124,7 @@ void mana_collision(){
      player.mana++;
      if(player.dashing)
         player.mana++;
-
+  
       crystal.alive = 0;
       return;
   }
@@ -123,12 +149,21 @@ void enemy_collision(int index){
 
   if(player_top >= enemy_bot && player_left <= enemy_right && player_right >= enemy_left &&
   player_bot <= enemy_top){
+     enemies[index].alive = DYING;
+     enemies[index].dying_time = 0;
      if(player.dashing){
-        enemies[index].alive = DYING;
-        enemies[index].dying_time = 0;
         player.mana += (int)rand()/(float)RAND_MAX * 2 + 1;
+     } else {
+       player.hp -= 50;
      }
-      return;
+  }
+}
+
+void mana_enemies_collision(){
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+        wall_collision(i);
+        enemy_collision(i);
   }
 }
 
@@ -139,6 +174,16 @@ void teleport(){
 
   if(player.curr_y > 1){
     player.curr_y = -1;
+  }
+}
+
+void heal(){
+  if(player.mana >0 && player.hp < max_hp){
+    player.mana--;
+    if(player.hp + heal_hp > max_hp)
+      player.hp = 100;
+    else
+      player.hp += heal_hp; 
   }
 }
 

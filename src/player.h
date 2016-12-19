@@ -1,16 +1,20 @@
 #ifndef PLAYER_H
   #define PLAYER_H
 
+  void player_init();
   void draw_player(float x, float y, float R, float G, float B);
   void draw_trail(float x, float y, float R, float G, float B, float size);
   void wall_collision(int index);
   void mana_collision();
   void enemy_collision(int index);
+  void mana_enemies_collision();
   void dash();
   void dash_start();
   void teleport();
+  void heal();
   void player_move();
   void summon_trail();
+  int alive();
   
 
   #define PLAYER_REFRESH_TIMER_ID 0
@@ -35,13 +39,14 @@
   typedef struct {
     float curr_x;
     float curr_y;
-    float v_y; // velocity
+    float v_y;
     float size;
     int hp;
     Color3f colors;
     int mana;
     int invulnerable;
     int dashing;
+    float dash_distance;
   } Player;
 
   typedef struct {

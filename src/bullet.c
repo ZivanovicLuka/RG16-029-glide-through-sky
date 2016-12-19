@@ -13,7 +13,7 @@
 
 Bullet bullets[WALL_COUNT][BULLET_COUNT];
 
-float bullet_dmg = 10;
+float bullet_dmg = 15;
 float bullet_size = .03;
 
 void bullets_init(){
@@ -50,6 +50,19 @@ void bullets_player_collision(){
                 else
                     player.hp -= bullet_dmg;
             }
+        }
+    }
+}
+
+void bullets_move(float ms){
+    int i,j;
+    for(i=0;i<WALL_COUNT;i++){
+        for(j=0;j<BULLET_COUNT;j++){
+            if(!bullets[i][j].alive)
+            continue;
+            bullets[i][j].curr_x-=ms;
+            bullets[i][j].curr_x+=bullets[i][j].v_x*.02;
+            bullets[i][j].curr_y+=bullets[i][j].v_y*.02;
         }
     }
 }
@@ -97,7 +110,15 @@ void bullets_walls_turrets_collision(){
 }
 
 void bullets_world_collision(){
-
+    int i,j;
+    for(i=0;i<WALL_COUNT;i++){
+        for(j=0;j<BULLET_COUNT;j++){
+            if(!bullets[i][j].alive)
+                continue;
+            if(bullets[i][j].curr_y > 1 || bullets[i][j].curr_y < -1)
+                bullets[i][j].alive=0;
+        }
+    }
 }
 
 void draw_bullet(int enemy_index, int bullet_index){

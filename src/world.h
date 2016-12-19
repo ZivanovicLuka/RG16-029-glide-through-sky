@@ -4,10 +4,12 @@
   #define STAR_X_NUMBER 7
   #define STAR_Y_NUMBER 8
 
-  void check_score(int index);
+  void check_score();
   void draw_world();
   void score_init();
   void stars_init();
+  void stars_move();
+  void restart();
 
   int window_width;
   int window_height;
@@ -35,7 +37,8 @@
     float gravity;
     float jump;
     int score;
-    float distance;
+    float wall_summon_distance;
+    float trail_summon_distance;
     int animation_ongoing;
     float time;
   } World;

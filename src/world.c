@@ -9,6 +9,12 @@
 #include "wall.h"
 #include "wall_externs.h"
 
+#include "enemy.h"
+
+#include "bullet.h"
+
+#include "mana.h"
+
 #include "world.h"
 
 
@@ -20,7 +26,8 @@ World world = {
   .0007, // world.gravity
   .027,  // world.jump
   0,     // world.score
-  0,     // world.distance
+  0,     // world.wall_summon_distance
+  0,     // world.trail_summon_distance
   0,     // world.animation_ongoing
   0      // world.time
 };
@@ -57,6 +64,17 @@ void stars_init(){
       stars[i][j].curr_y = 2.4/STAR_Y_NUMBER * (j + dy) - 1.2;
       stars[i][j].speed =  rand() / (float)RAND_MAX * .0007 + 0.0002;
     }
+  }
+}
+
+void stars_move(){
+  int i,j;
+  for(i=0;i<STAR_X_NUMBER;i++){
+    for(j=0;j<STAR_Y_NUMBER;j++){
+      stars[i][j].curr_x -= stars[i][j].speed;
+      if(stars[i][j].curr_x<-2)
+        stars[i][j].curr_x=2;
+    }  
   }
 }
 
@@ -103,12 +121,29 @@ void draw_world(){
   glutPostRedisplay();
 }
 
-void check_score(int index){
-  if(!walls[index].pass){
-    if(walls[index].curr_x + wall_width/2 < player.curr_x - player.size/2){
-      walls[index].pass = 1;
-      world.score++;
-      sprintf(gui.score_text, "Score: %d", world.score); // FIXME SPORO!!!
+void check_score(){
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+    if(!walls[i].pass){
+      if(walls[i].curr_x + wall_width/2 < player.curr_x - player.size/2){
+        walls[i].pass = 1;
+        world.score++;
+        sprintf(gui.score_text, "Score: %d", world.score);
+      }
     }
   }
+}
+
+void restart(){
+  printf("Score: %d\n", world.score);
+  
+  player_init();
+  bullets_init();
+  stars_init();
+  score_init();
+  wall_init();
+  enemies_init();
+  mana_crystal_init();
+  world.score = 0;
+  world.animation_ongoing = 0;
 }

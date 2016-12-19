@@ -14,9 +14,11 @@ float wall_speed = 0.013;
 float wall_gap = 1.;
 float wall_gap_min = .7;
 float wall_gap_dec = .03;
-int wall_summon_index = 0;
+int wall_summon_index;
 
 void wall_init(){
+  // wall_summon_index = 0;
+  wall_gap = 1.;
   int i;
   for(i=0; i<WALL_COUNT; i++){
       walls[i].pass = 1;
@@ -44,6 +46,13 @@ void summon_wall(){
   walls[index].colorB = rand() / (float)RAND_MAX * 0.5 + 0.5;
   walls[index].alive = 1;
   walls[index].pass = 0;
+}
+
+void walls_move(float ms){
+  int i;
+  for(i=0;i<WALL_COUNT;i++){
+    walls[i].curr_x -= ms;
+  }
 }
 
 void draw_wall(float x, int index){

@@ -13,11 +13,19 @@
 #include "world.h"
 #include "world_externs.h"
 
-Crystal crystal; //nece biti vise zivih kristala od zidova sigurno
-float mana_crystal_rotation = 30;
-float mana_init_time=0;
-float mana_init=0;
-int walls_passed_counter = 0;
+Crystal crystal;
+float mana_crystal_rotation;
+float mana_init_time;
+float mana_init;
+int walls_passed_counter;
+
+void mana_crystal_init(){
+  mana_crystal_rotation = 30;
+  mana_init_time = 0;
+  mana_init = 0;
+  walls_passed_counter = 0;
+  crystal.alive = 0;
+}
 
 void summon_mana(int index){
   crystal.alive = 1;
@@ -68,6 +76,14 @@ void draw_mana_crystal(){
 
 
   }
+}
+
+void mana_crystal_move(float ms){
+  mana_crystal_rotation += speed_correction * 1.8;
+  if (world.animation_ongoing) {
+    crystal.curr_x -= ms;
+  }
+  crystal.curr_y = sin(mana_crystal_rotation*.02)*.08;
 }
 
 void draw_mana_circle(int mana){
@@ -126,4 +142,15 @@ void draw_mana_circle(int mana){
   // emission_coeffs[2] = 0;
   // emission_coeffs[3] = 1;
   // glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
+}
+
+void mana_circle_init_animation(float ms){
+  if(mana_init<3){
+    mana_init_time+=ms;
+    if(mana_init_time > 30*ms){
+      mana_init++;
+      player.mana++;
+      mana_init_time-= 30*ms;
+    }
+  }
 }

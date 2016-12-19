@@ -4,6 +4,7 @@
   void draw_wall(float x, int index);
   void summon_wall();
   void wall_init();
+  void walls_move(float ms);
 
   #define WALL_COUNT 4
 

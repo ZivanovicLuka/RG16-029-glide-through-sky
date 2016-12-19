@@ -6,7 +6,9 @@
 
   void draw_enemy(int index);//float y, float x, float colorR, float colorG, float colorB, int alive, float angle);
   void summon_enemy();
-  void aim();
+  void enemies_move(float ms);
+  void enemies_init();
+  void enemies_aim();
   void fire(int index);
   int in_range(int index);
 
