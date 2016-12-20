@@ -30,7 +30,7 @@
     float B;
   } Color3f;
 
-  Color3f global_colors[8]; // TODO konstanta
+  Color3f global_colors[8]; 
   int global_colors_number;
 
   typedef struct {

@@ -26,7 +26,8 @@
 #include "bullet.h"
 #include "bullet_externs.h"
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[])
+{
 
   glutInit(&argc,argv);
 
@@ -47,6 +48,7 @@ int main(int argc, char* argv[]){
 
   srand(time(NULL));
 
+  /* Game elements init */
   player_init();
   bullets_init();
   stars_init();
@@ -60,7 +62,8 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
-static void on_keyboard(unsigned char key, int x, int y) {
+static void on_keyboard(unsigned char key, int x, int y)
+{
     switch (key) {
       case 27:
         exit(0);
@@ -83,6 +86,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
       case 'Q':
         if (world.animation_ongoing) {
           if(!player.dashing)
+            /* Velocity Y */
             player.v_y = world.jump;
         }
         break;
@@ -105,7 +109,9 @@ static void on_keyboard(unsigned char key, int x, int y) {
     }
 }
 
-static void on_reshape(int width, int height){
+/* Stays in 1:1 ratio, with ~black color left and right */
+static void on_reshape(int width, int height)
+{
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
@@ -118,7 +124,8 @@ static void on_reshape(int width, int height){
   glutPostRedisplay();
 }
 
-static void on_timer(int value){
+static void on_timer(int value)
+{
     if(value == PLAYER_REFRESH_TIMER_ID){
 
       /* Correction for different performances */
@@ -130,11 +137,15 @@ static void on_timer(int value){
         restart();
       }
 
+      /* Summons elements when player passes 1.3 distance (+.2 for start) */
       if(world.wall_summon_distance>=1.5){
         world.wall_summon_distance-=1.3;
         summon_wall();
-        summon_enemy(); 
+        summon_enemy();
+        /* Enemies are shooting when wall and enemy spawns (if target is in range) */
+        /* Looks great with same timer */
         enemies_fire();
+        /* Every 4th wall, mana crystal is spawned (in function every 4th) */
         summon_mana();
       }
       world.wall_summon_distance += ms;
@@ -145,6 +156,7 @@ static void on_timer(int value){
       }
       world.trail_summon_distance += ms;
 
+      /* Moving all game elements */
       player_move();
       stars_move();
       walls_move(ms);
@@ -152,12 +164,14 @@ static void on_timer(int value){
       mana_crystal_move(ms);
       bullets_move(ms);
  
+      /* Checking collisions */
       mana_enemies_collision();
       bullets_player_collision();
       bullets_walls_turrets_collision();
       bullets_world_collision();
       mana_collision();
       
+      /* Game features */
       teleport();
       dashing(ms);
       enemies_aim();
@@ -172,13 +186,15 @@ static void on_timer(int value){
     }
 }
 
-void on_display(){
+void on_display()
+{
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   fps(1);
 
   /* Light positon */
   GLfloat light_position[] = { 0, 0, 2.45, 1 };
 
+  /* Light init */
   GLfloat light_ambient[] = { .1, .1, .1, 1 };
   GLfloat light_diffuse[] = { .7, .7, .7, 1 };
   GLfloat light_specular[] = { .9, .9, .9, 1 };
@@ -191,23 +207,26 @@ void on_display(){
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 
 
-  /* Koeficijent glatkosti materijala. */
+  /* Material coeffs and shininess */
   GLfloat ambient_coeffs[] = { .3, .3, .3, 1 };
   GLfloat specular_coeffs[] = { .5, .5, .5, 1 };
   GLfloat shininess = 100;
 
-    /* Podesavaju se parametri materijala. */
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
   glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
   glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
-  /* Podesava se vidna tacka. */
-
+  /* Camera */
   gluLookAt(0, 0, 2, 0, 0, 0, 0, 1, 0);
+
+  /* Fix for scaled objects (normals) */
   glEnable(GL_NORMALIZE);
+
+  /* Matrix set */
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
+  /* Drawing functions */
   draw_world();
   draw_walls();
   draw_enemies();

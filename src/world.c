@@ -25,28 +25,31 @@ int window_height = 500;
 float speed_correction = 1;
 
 World world = {
-  .0007, // world.gravity
-  .027,  // world.jump
-  0,     // world.score
-  0,     // world.wall_summon_distance
-  0,     // world.trail_summon_distance
-  0,     // world.animation_ongoing
-  0      // world.time
+  .0007, /*world.gravity*/
+  .027,  /*world.jump*/
+  0,     /*world.score*/
+  0,     /*world.wall_summon_distance*/
+  0,     /*world.trail_summon_distance*/
+  0,     /*world.animation_ongoing*/
+  0      /*world.time*/
 };
 
 float distance = 0;
 
 Star stars[STAR_X_NUMBER][STAR_Y_NUMBER];
 
-void score_init(){
+void score_init()
+{
   strcpy(score_text,"Score: 0");
   return;
 }
 
-void stars_init(){
+void stars_init()
+{
   int i,j;
   for(i=0;i<STAR_X_NUMBER;i++){
     for(j=0;j<STAR_Y_NUMBER;j++){
+      /* Positioning stars nearly grid line, but randomly moved for dx and dy */
       float dx = rand() / (float)RAND_MAX *1.6 - .8;
       float dy = rand() / (float)RAND_MAX *1.6 - .8;
 
@@ -57,7 +60,8 @@ void stars_init(){
   }
 }
 
-void stars_move(){
+void stars_move()
+{
   int i,j;
   for(i=0;i<STAR_X_NUMBER;i++){
     for(j=0;j<STAR_Y_NUMBER;j++){
@@ -68,7 +72,9 @@ void stars_move(){
   }
 }
 
-void draw_world(){
+/* Draws stars, floor and ceil  */
+void draw_world()
+{
   GLfloat diffuse_coeffs[] = { 0, 0, .1, 1 };
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
   glMaterialfv(GL_FRONT, GL_SPECULAR, diffuse_coeffs);
@@ -92,6 +98,7 @@ void draw_world(){
   glMaterialfv(GL_FRONT, GL_SPECULAR, diffuse_coeffs);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
+  /* Stars are only light by ambinet light */
   GLfloat ambient_coeffs[] = { .8, .8, .8, 1 };
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
 
@@ -111,7 +118,8 @@ void draw_world(){
   glutPostRedisplay();
 }
 
-void check_score(){
+void check_score()
+{
   int i;
   for(i=0;i<WALL_COUNT;i++){
     if(!walls[i].pass){
@@ -124,14 +132,16 @@ void check_score(){
   }
 }
 
-void draw_score(){
+void draw_score()
+{
   float text_x = -.93;
   float text_y = .89;
   float text_z = .3;
   RenderString(text_x, text_y, GLUT_BITMAP_HELVETICA_18, score_text, .6, .6, .6);
 }
 
-void restart(){
+void restart()
+{
   printf("Score: %d\n", world.score);
 
   player_init();

@@ -3,8 +3,13 @@
 #include <stdio.h>
 #include "misc_functions.h"
 
+#define DT_MAX 60
+static int newTime;
+static int oldTime = 0;
+static int timeSum = 0;
 
-void RenderString(float x, float y, void *font, const char* string, float r, float g, float b) {
+void RenderString(float x, float y, void *font, const char* string, float r, float g, float b)
+{
   GLfloat emission_coeffs[] = { r, g, b, 1 };
   glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
   glRasterPos3f(x, y, .3);
@@ -16,11 +21,8 @@ void RenderString(float x, float y, void *font, const char* string, float r, flo
   glMaterialfv(GL_FRONT, GL_EMISSION, emission_coeffs);
 }
 
-#define DT_MAX 60
-static int newTime;
-static int oldTime = 0;
-static int timeSum = 0;
-
+/* Counts time between two timer functions */
+/* Used for scaling gameplay for different perfomances */
 void updateDeltaTime() {
     newTime = glutGet(GLUT_ELAPSED_TIME);
     dt = newTime - oldTime;
@@ -30,6 +32,7 @@ void updateDeltaTime() {
         dt=DT_MAX;
 }
 
+/* Every second counts how many frames are drawen, and prints them */
 void fps(int print) {
     static int frame = 0;
     frame++;

@@ -12,10 +12,9 @@
     float curr_y;
     float curr_x;
     int alive;
-    int pass; // ne znam sta je sad
-    float rotation_time;
   } Crystal;
 
+  float circle_rotation_time;
   float mana_crystal_rotation;
   int walls_passed_counter;
   float mana_init_time;
