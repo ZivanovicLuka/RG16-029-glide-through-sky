@@ -51,4 +51,5 @@ Hitting wall removes 100% of your hp
 Hitting mana crystal whiel dashing gives you 1 mana (not losing for dash)  
 Hitting enemy with dash gives you 1-2 mana
 
-
+![Unable to show Screenshot](https://github.com/MATF-RG16/RG16-029-glide-through-sky/blob/master/screenshots/screenshot007.gif?raw=true)  
+[**Download gameplay video**](https://github.com/MATF-RG16/RG16-029-glide-through-sky/blob/master/screenshots/Gameplay.mp4?raw=true)
