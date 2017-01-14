@@ -2,8 +2,22 @@
 
 ![Unable to show Screenshot](https://github.com/MATF-RG16/RG16-029-glide-through-sky/blob/master/screenshots/screenshot006.png?raw=true)
 
+### :package: Installation
+Navigate to the project root folder (where the **Makefile** is located), and compile the code by calling **make**:
+```
+make
+```
+**Note:** For **make** to work, you must have the OpenGL/GLUT/Freeglut libraries installed.
+You can find them **[here](https://www.opengl.org/resources/libraries/glut/)**.
+
+After that, run **Glide Through Sky** executable:
+
+```
+./glideThroughSky.out
+```
+
 ***
-###:video_game: Controls :video_game:
+###:video_game: Controls
 
 <table>
   <tr>
