@@ -1,7 +1,7 @@
 #ifndef GLUT_FUCNTIONS_H
   #define GLUT_FUCNTIONS_H
 
-  #define DT_MAX 60
+  #define DT_MAX 30
 
   void RenderString(float x, float y, void *font, const char* string, float r, float g, float b);
   static void on_timer(int value);

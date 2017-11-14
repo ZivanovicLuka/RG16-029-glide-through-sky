@@ -72,8 +72,12 @@ static void on_keyboard(unsigned char key, int x, int y)
       case 'g':
       case 'G':
         if (!world.animation_ongoing) {
-            glutTimerFunc(PLAYER_REFRESH_TIMER_INTERVAL, on_timer, PLAYER_REFRESH_TIMER_ID);
-            world.animation_ongoing = 1;
+            if(!alive()){
+                restart();
+            } else {
+                glutTimerFunc(PLAYER_REFRESH_TIMER_INTERVAL, on_timer, PLAYER_REFRESH_TIMER_ID);
+                world.animation_ongoing = 1;
+            }
         }
         break;
 
@@ -134,7 +138,7 @@ static void on_timer(int value)
       float ms = wall_speed * speed_correction;
 
       if(!alive()){
-        restart();
+        game_over();
       }
 
       /* Summons elements when player passes 1.3 distance (+.2 for start) */
@@ -163,14 +167,14 @@ static void on_timer(int value)
       enemies_move(ms,speed_correction);
       mana_crystal_move(ms);
       bullets_move(ms);
- 
+
       /* Checking collisions */
       mana_enemies_collision();
       bullets_player_collision();
       bullets_walls_turrets_collision();
       bullets_world_collision();
       mana_collision();
-      
+
       /* Game features */
       teleport();
       dashing(ms);
@@ -240,4 +244,3 @@ void on_display()
   glFlush();
   glutSwapBuffers();
 }
-

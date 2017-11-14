@@ -68,14 +68,25 @@ void stars_move()
       stars[i][j].curr_x -= stars[i][j].speed;
       if(stars[i][j].curr_x<-2)
         stars[i][j].curr_x=2;
-    }  
+    }
   }
 }
 
 /* Draws stars, floor and ceil  */
 void draw_world()
 {
-  GLfloat diffuse_coeffs[] = { 0, 0, .1, 1 };
+  GLfloat diffuse_coeffs[4];
+  if(alive()){
+    diffuse_coeffs[0] = 0;
+    diffuse_coeffs[1] = 0;
+    diffuse_coeffs[2] = .1;
+    diffuse_coeffs[3] = 1;
+  } else {
+    diffuse_coeffs[0] = .5;
+    diffuse_coeffs[1] = 0;
+    diffuse_coeffs[2] = .1;
+    diffuse_coeffs[3] = 1;
+  }
   glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
   glMaterialfv(GL_FRONT, GL_SPECULAR, diffuse_coeffs);
 
@@ -143,7 +154,6 @@ void draw_score()
 void restart()
 {
   printf("Score: %d\n", world.score);
-
   player_init();
   bullets_init();
   stars_init();
@@ -153,6 +163,20 @@ void restart()
   mana_crystal_init();
   world.score = 0;
   wall_speed = .013;
-  
-  world.animation_ongoing = 0;
+}
+
+void game_over()
+{
+    player.colors.R = .5;
+    player.colors.G = 0;
+    player.colors.B = 0;
+
+    int i;
+    for(i=0;i<WALL_COUNT;i++){
+      walls[i].colorR = .5;
+      walls[i].colorG = 0;
+      walls[i].colorB = 0;
+    }
+
+    world.animation_ongoing = 0;
 }

@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "misc_functions.h"
 
-#define DT_MAX 60
 static int newTime;
 static int oldTime = 0;
 static int timeSum = 0;

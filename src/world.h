@@ -11,6 +11,7 @@
   void stars_move();
   void draw_score();
   void restart();
+  void game_over();
 
   int window_width;
   int window_height;

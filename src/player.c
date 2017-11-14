@@ -35,7 +35,7 @@ void player_init()
     0,   /*player.curr_y*/
     0,   /*player.v_y*/
     .1,  /*player.size*/
-    70,  /*player.hp*/
+    START_HP,  /*player.hp*/
     global_colors[(int)(rand()/(float)RAND_MAX * global_colors_number)], /*player.colors*/
     0,   /*player.mana*/
     0,   /*player.invulnerable*/
@@ -101,7 +101,7 @@ void wall_collision(int index)
   if((player_top >= wall_bot && player_left <= wall_right && player_right >= wall_left) ||
   (player_bot <= wall_top && player_left <= wall_right && player_right >= wall_left)){
     if(!player.dashing){
-      restart();
+      player.hp = 0;
     } else {
       walls[index].hollow = 1;
       walls[index].hole_y = player.curr_y;
@@ -139,7 +139,7 @@ void mana_collision()
      player.mana++;
      if(player.dashing)
         player.mana++;
-  
+
       crystal.alive = 0;
       return;
   }
@@ -150,7 +150,7 @@ void enemy_collision(int index)
   if(enemies[index].alive != 1)
     return;
 
-  float enemy_height = .14; 
+  float enemy_height = .14;
   float enemy_width = .16;
 
   float enemy_bot = enemies[index].curr_y - enemy_height/2;
@@ -206,7 +206,7 @@ void heal()
     if(player.hp + heal_hp > max_hp)
       player.hp = 100;
     else
-      player.hp += heal_hp; 
+      player.hp += heal_hp;
   }
 }
 
@@ -250,7 +250,7 @@ void dashing(float ms)
   if(player.dashing)
     player.dash_distance += ms; /* Counts how long dash lasts */
   /* If dash distance is big enough, stop dashing and reset dash distance */
-  if(player.dash_distance >= .95){ 
+  if(player.dash_distance >= .95){
     if(player.dashing){
       player.dashing = 0;
     }

@@ -13,7 +13,7 @@
 #include "bullet_externs.h"
 
 /* Enemy is always on the wall, so WALL_COUNT is the same number for enemies as well */
-Enemy enemies[WALL_COUNT]; 
+Enemy enemies[WALL_COUNT];
 
 float range = 2;
 int enemy_summon_index = 0; /* enemies is static array, so this index tracks wich one should summon */
@@ -68,17 +68,17 @@ void enemy_fire(int index)
     float vx = cos(enemies[index].angle/180.0*M_PI);
     float vy = sin(enemies[index].angle/180.0*M_PI);
     float vector_intensity = sqrt(pow(vx ,2) + pow(vy,2));
-    
+
     bullets[index][bullet_index].v_x = vx/vector_intensity; /* vector normalize */
     bullets[index][bullet_index].v_y = vy/vector_intensity; /* vector normalize */
     bullets[index][bullet_index].angle = enemies[index].angle;
 
-    bullets[index][bullet_index].curr_x = enemies[index].curr_x + 
+    bullets[index][bullet_index].curr_x = enemies[index].curr_x +
                                           bullets[index][bullet_index].v_x*.15; /* Moving bullet to tip of gun */
-    bullets[index][bullet_index].curr_y = enemies[index].curr_y + 
+    bullets[index][bullet_index].curr_y = enemies[index].curr_y +
                                           bullets[index][bullet_index].v_y*.15 + /* Moving bullet to tip of gun */
                                           enemies[index].rotation*(.04 + .03);   /* base/2 + top/2 */
-   
+
     bullets[index][bullet_index].alive = 1;
     /* Increases index, or returns it to 0 if max*/
     enemies[index].bullet_index = (++bullet_index == BULLET_COUNT) ?
@@ -102,7 +102,7 @@ void enemies_move(float ms, float speed_correction)
     if(enemies[i].alive == DYING)
       /* If enemy is dying, increase dying parameter */
       /* Speed corection fixes differences between different performances */
-      enemies[i].dying_time += .0075*speed_correction; 
+      enemies[i].dying_time += .0075*speed_correction;
   }
 }
 
@@ -178,7 +178,7 @@ void draw_enemy(int index)
       glScalef(1/top_width,1/top_height,1/top_part_width);
       glTranslatef(0,0,top_part_width/2 + gun_width/2 + enemies[index].dying_time);
       /**************************************************/
-      
+
       /* Even darker color for upper part of turret */
        diffuse_coeffs[0] = .3 * colorR;
        diffuse_coeffs[1] = .3 * colorR;

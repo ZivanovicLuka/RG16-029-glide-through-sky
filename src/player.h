@@ -17,7 +17,8 @@
   void player_move();
   void summon_trail();
   int alive();
-  
+
+  #define START_HP 70
 
   #define PLAYER_REFRESH_TIMER_ID 0
   #define PLAYER_REFRESH_TIMER_INTERVAL 10
@@ -30,7 +31,7 @@
     float B;
   } Color3f;
 
-  Color3f global_colors[8]; 
+  Color3f global_colors[8];
   int global_colors_number;
 
   typedef struct {
